@@ -1,0 +1,19 @@
+[
+  {
+    "type": "function",
+    "function": {
+      "name": "run_shell",
+      "description": "Выполнить команду в терминале Linux. Возвращает stdout, stderr и код выхода. Используй для всего: apt, systemctl, docker, git, nmap, ls, cat и т.д.",
+      "parameters": {
+        "type": "object",
+        "required": ["command"],
+        "properties": {
+          "command": {
+            "type": "string",
+            "description": "Команда для выполнения, например: df -h или ls -la /tmp"
+          }
+        }
+      }
+    }
+  }
+]
