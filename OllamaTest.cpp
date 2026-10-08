@@ -18,7 +18,7 @@ int main() {
 
     cout << uinput<< endl;
 
-   for(int i = 0; i < 15; i++){
+  
 
    if(uinput == "/exit") break;
 
@@ -37,7 +37,7 @@ int main() {
         //if (text.empty()) continue;
 
         history.push_back({ {"role","user"}, {"content", uinput} });
-        SendToOllama();
+        while(SendToOllama()){}
       }
     } else {
       history.push_back({ {"role","user"}, {"content", uinput} });
@@ -45,7 +45,7 @@ int main() {
     }
 
 
-   } //for 1
+  
 
 
 

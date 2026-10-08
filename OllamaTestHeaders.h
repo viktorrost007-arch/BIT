@@ -33,7 +33,7 @@ void stopRec();
 
 string readSysPrompt(const string& syspromptfile);
 
-void SendToOllama();
+bool SendToOllama();
 string SendToWhisper();
 string getCmd();
 

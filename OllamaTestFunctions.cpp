@@ -28,7 +28,7 @@ json tools = json::parse(ifstream("tools.json"));
 string source = "192.168.20.4:11434";
 
 string syspromptfile = "prompt.txt";
-string sysprompt readSysPrompt(syspromptfile);
+string sysprompt = readSysPrompt(syspromptfile);
 string filepath = "test.wav";
 
 int counter;
@@ -66,12 +66,12 @@ string readSysPrompt(const string& syspromptfile){
 
 ////send function
 
-void SendToOllama() {
+bool SendToOllama() {
 
     json request = {
         {"model",  "qwen2.5:7b"},
-        {"stream", false}
-        {"tools", tools}
+        {"stream", false},
+        {"tools", tools},
         {"messages", history}
     };
 
@@ -80,11 +80,29 @@ void SendToOllama() {
     cli.set_read_timeout(60, 0);
 
     auto res = cli.Post("/api/chat", request.dump(), "application/json");
-    if (!res) { cerr << "http error\n"; return; }
+    if (!res) { cerr << "http error\n"; return false; }
 
-    uianswer = json::parse(res->body)["message"]["content"];
-    history.push_back({ {"role","assistant"}, {"content", uianswer} });
-    //return 200;
+   
+    json msg = json::parse(res->body)["message"];
+    history.push_back(msg);
+
+    if(msg.contains("tools_calls") && !msg["tool_calls"].empty()){
+        for(auto& call : msg["tool_calls"]){
+            string name = call["function"]["name"];
+            json args = call ["function"]["arguments"];
+            string toolout = runTool(name,args);
+            cout<< name << ">> "<< args;
+            history.push_back({
+                {"role", "tool"},
+                {"tool_name", name},
+                {"content", toolout}
+            });
+        }
+        return true;
+    }
+    
+    uianswer = msg["content"];
+    return false;
 
 }
 
@@ -121,6 +139,7 @@ string runTool(const string& name, const json& args) {
     if (name == "run_shell") return executeCommand(args["command"]);
     return "unknown tool: " + name;
 }
+
 
 string executeCommand(const string& cmd) {
     FILE* p = popen((cmd + " 2>&1").c_str(), "r");
