@@ -86,22 +86,26 @@ bool SendToOllama() {
     json msg = json::parse(res->body)["message"];
     history.push_back(msg);
 
-    if(msg.contains("tools_calls") && !msg["tool_calls"].empty()){
+    if(msg.contains("tool_calls") && !msg["tool_calls"].empty()){
         for(auto& call : msg["tool_calls"]){
             string name = call["function"]["name"];
             json args = call ["function"]["arguments"];
             string toolout = runTool(name,args);
-            cout<< name << ">> "<< args;
+            //cout<< name << ">> "<< args;
             history.push_back({
                 {"role", "tool"},
                 {"tool_name", name},
                 {"content", toolout}
             });
+            cout << "> TOOL"<< " "<< name << endl;
+            cout << "> "<< args << endl;
+            
         }
         return true;
     }
     
     uianswer = msg["content"];
+    
     return false;
 
 }

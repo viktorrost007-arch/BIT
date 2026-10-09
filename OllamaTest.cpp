@@ -9,8 +9,10 @@ int main() {
 
   history.push_back({ {"role","system"}, {"content", sysprompt} });
   cout<< greeting << endl;
-  std::string command = "espeak-ng -v en \"" + textgreeting+ "\"";
-  std::system(command.c_str());
+  ofstream("/tmp/say.txt") << textgreeting;
+    system("espeak-ng -v en -f /tmp/say.txt");
+  // std::string command = "espeak-ng -v en \"" + textgreeting+ "\"";
+  // std::system(command.c_str());
 
   cout<< "Wah do you wanna ask?";
 
@@ -34,14 +36,14 @@ int main() {
 
         string uinput = SendToWhisper();
         cout << "you> " << uinput  << "\n";
-        //if (text.empty()) continue;
+        if (uinput.empty()) continue;
 
         history.push_back({ {"role","user"}, {"content", uinput} });
         while(SendToOllama()){}
       }
     } else {
       history.push_back({ {"role","user"}, {"content", uinput} });
-      SendToOllama();
+     while( SendToOllama()){}
     }
 
 
@@ -49,9 +51,12 @@ int main() {
 
 
 
-    cout << "bit> \"" <<uianswer << """" << "\"\n";
-    string speechcommand = "espeak-ng -v ru \"" + uianswer + "\"";
-    system(speechcommand.c_str());
+    //cout << "BIT> \"" <<uianswer << """" << "\"\n";
+    cout << "BIT>  " << uianswer << "    " << "\n";
+    // string speechcommand = "espeak-ng -v ru \"" + uianswer + "\"";
+    // system(speechcommand.c_str());
+    ofstream("/tmp/say.txt") << uianswer;
+    system("espeak-ng -v ru -f /tmp/say.txt");
 
   }
   remove("test.wav");
