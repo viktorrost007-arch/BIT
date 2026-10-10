@@ -6,6 +6,8 @@
 
 int main() {
 
+  readSettings();
+  textgreeting = settings["greeting"];
 
   history.push_back({ {"role","system"}, {"content", sysprompt} });
   cout<< greeting << endl;
@@ -14,14 +16,12 @@ int main() {
   // std::string command = "espeak-ng -v en \"" + textgreeting+ "\"";
   // std::system(command.c_str());
 
-  cout<< "Wah do you wanna ask?";
+  cout<< "What do you wanna ask?"<< endl;
 
   while (getline(cin, uinput)) {
 
-    cout << uinput<< endl;
-
-  
-
+  //cout << uinput<< endl;
+ 
    if(uinput == "/exit") break;
 
     if (uinput.empty()) {

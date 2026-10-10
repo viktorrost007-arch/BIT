@@ -34,8 +34,7 @@ string filepath = "test.wav";
 int counter;
 
 FILE* rec = nullptr;
-
-
+  
 
 
 
@@ -74,9 +73,9 @@ bool SendToOllama() {
         {"tools", tools},
         {"messages", history}
     };
-
+    string cliadress = settings["ollama_address"];
     // 1. Указываем только БАЗОВЫЙ адрес сервера (куда стучимся по сети)
-    httplib::Client cli("http://192.168.20.4:11434");
+    httplib::Client cli(cliadress);
     cli.set_read_timeout(60, 0);
 
     auto res = cli.Post("/api/chat", request.dump(), "application/json");
@@ -116,8 +115,8 @@ bool SendToOllama() {
 
 
 string SendToWhisper() {
-    string cmd = "curl -s http://192.168.20.4:10300/v1/audio/transcriptions -F \"file=@test.wav\"";
-
+    //string cmd = "curl -s http://192.168.20.4:10300/v1/audio/transcriptions -F \"file=@test.wav\"";
+    string cmd = "curl -s " + settings["whisper_address"] + " -F \"file=@test.wav\"";
     FILE* p = popen(cmd.c_str(), "r");
     if (!p) return "";
 
@@ -125,7 +124,7 @@ string SendToWhisper() {
     char buf[4096];
     while (fgets(buf, sizeof(buf), p)) out += buf;
     pclose(p);
-
+ 
     return json::parse(out).value("text", "");
 }
 
@@ -161,3 +160,19 @@ string executeCommand(const string& cmd) {
     if (out.size() > 4000) out = out.substr(0, 4000) + "\n...(truncated)";
     return out;
 }
+
+void readSettings(){
+
+    string line, key;
+    ifstream file("settings.txt");
+    if(!file.is_open()) {
+        std::cerr << "CAN'T OPEN settings.txt"<< endl;
+        return;
+        }
+    while(getline(file, line)){
+        if (line.empty() || line[0] == '*') continue; // skip empty lines 
+        if (line[0] == '#') {key = line.substr(1); continue;}
+        settings[key] = line;
+        
+        }
+    }

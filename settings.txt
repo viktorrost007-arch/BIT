@@ -1,0 +1,14 @@
+*WELCOME IN THE BETA VERSION OF THE SETTINGS-FILE, PLEASE FOLLOW INSTRUCTIONS BELOW.
+*please dont use any whitespaces as the first or last symbol of the line,
+*please also don't change the values after hashtags.
+
+#whisper_address
+http://192.168.20.4:10300/v1/audio/transcriptions
+
+#ollama_address
+192.168.20.4:11434
+
+#greeting
+hi
+
+

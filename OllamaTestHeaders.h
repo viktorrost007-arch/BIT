@@ -9,6 +9,7 @@
 #include "httplib.h"
 #include "json.hpp"
 #include <cstdio>
+#include <map> 
 
 using namespace std;
 using json = nlohmann::json;
@@ -16,7 +17,7 @@ using json = nlohmann::json;
 
 
 
-
+extern map <string,string> settings;
 extern bool recording;            // ← тут
 extern string greeting;      // ← тут
 extern string textgreeting;  // ← тут
@@ -28,10 +29,12 @@ extern string syspromptfile;
 extern string sysprompt;
 extern string filepath;
 
+
 void startRec();
 void stopRec();
 
 string readSysPrompt(const string& syspromptfile);
+void readSettings();
 
 bool SendToOllama();
 string SendToWhisper();
