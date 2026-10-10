@@ -25,7 +25,7 @@ json tools = json::parse(ifstream("tools.json"));
 
 
 
-string source = "192.168.20.4:11434";
+//string source = "192.168.20.4:11434";
 
 string syspromptfile = "prompt.txt";
 string sysprompt = readSysPrompt(syspromptfile);
@@ -35,7 +35,7 @@ int counter;
 
 FILE* rec = nullptr;
   
-
+map <string, string> settings;
 
 
 
