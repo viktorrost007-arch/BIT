@@ -52,8 +52,8 @@ void checkfirst_time(){
 void setup(){
     map <string, string> first_time_settings;
     
-    textgreeting = "Hi, I am BIT, nice to meet you here! Please fill the settings and we can start! To skip enter exit in first question." ;
-    cout<< "Hi, I am BIT, nice to meet you here! Please fill the settings and we can start! To skip enter exit in first question." << endl;
+    textgreeting = "Hi, I am BIT, nice to meet you here! Please fill the settings and we can start! " ;
+    cout<< "Hi, I am BIT, nice to meet you here! Please fill out the settings and we can start! " << endl;
     cout<< "You can change them every time you want in settings.txt"<< endl;
     cout << "Please write your system-prompt in prompt.txt"<< endl << endl;
     cout<< " Which LLM model do you use in Ollama? (for example qwen2.5:7b)"<< endl;
@@ -216,6 +216,18 @@ void readSettings(){
         cout << "There are some sources missing. Start auto-healing?" << endl;
         autohealing = true; 
         cout << "Sorry, auto-healing not suppoorted in this version, please enter setup or create file settings.txt at yourself"<< endl;
+        cout << "Enter setup? y for yes, n for no"<< endl;
+        string i;
+        cin >> i;
+        if(i == "y" || i == "Y") setup();
+        else {
+            cout << "You can create settings.txt at yourself, please follow the instructions in the file." << endl;
+            cout << "Please also create prompt.txt with your system-prompt." << endl;
+            cout << "Exiting..." << endl;
+            exit(1);
+        }
+
+
         return;
         }
     while(getline(file, line)){

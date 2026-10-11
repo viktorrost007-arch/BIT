@@ -6,9 +6,14 @@
 
 int main() {
 
+  cout<< greeting << endl; //BIT
+
   checkfirst_time();
   readSettings();
   textgreeting = settings["greeting"];
+
+  ofstream("/tmp/say.txt") << textgreeting;
+    system("espeak-ng -v en -f /tmp/say.txt");
 
   history.push_back({ {"role","system"}, {"content", sysprompt} });
   cout<< greeting << endl;
@@ -54,7 +59,7 @@ int main() {
 
 
     //cout << "BIT> \"" <<uianswer << """" << "\"\n";
-    cout << "BIT>  " << uianswer << "    " << "\n";
+    cout << "BIT>  " << uianswer << " " << endl;
     // string speechcommand = "espeak-ng -v ru \"" + uianswer + "\"";
     // system(speechcommand.c_str());
     ofstream("/tmp/say.txt") << uianswer;
