@@ -8,11 +8,13 @@ int main() {
 
   cout<< greeting << endl; //BIT
 
+  checkfirst_time();
+  readSettings();
+
   ofstream("/tmp/say.txt") << textgreeting;
     system("espeak-ng -v en -f /tmp/say.txt");
 
-  checkfirst_time();
-  readSettings();
+  
   textgreeting = settings["greeting"];
   system("clear");
 
