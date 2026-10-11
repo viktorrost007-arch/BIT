@@ -5,7 +5,7 @@
 
 
 int main() {
-
+  system("which arecord espeak-ng curl >/dev/null 2>&1 || echo 'ВНИМАНИЕ: не все зависимости установлены'");
   cout<< greeting << endl; //BIT
 
   checkfirst_time();
