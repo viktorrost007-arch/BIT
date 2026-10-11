@@ -11,9 +11,6 @@ int main() {
   checkfirst_time();
   readSettings();
 
-  ofstream("/tmp/say.txt") << textgreeting;
-    system("espeak-ng -v en -f /tmp/say.txt");
-
   
   textgreeting = settings["greeting"];
   system("clear");

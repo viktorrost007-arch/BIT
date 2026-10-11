@@ -53,9 +53,15 @@ void setup(){
     map <string, string> first_time_settings;
     
     textgreeting = "Hi, I am BIT, nice to meet you here! Please fill the settings and we can start! " ;
+    
+     ofstream("/tmp/say.txt") << textgreeting;
+    system("espeak-ng -v en -f /tmp/say.txt");
+
+
     cout<< "Hi, I am BIT, nice to meet you here! Please fill out the settings and we can start! " << endl;
     cout<< "You can change them every time you want in settings.txt"<< endl;
     cout << "Please write your system-prompt in prompt.txt"<< endl << endl;
+    
     cout<< " Which LLM model do you use in Ollama? (for example qwen2.5:7b)"<< endl;
     cin >> first_time_settings["ollama_model"];
     
