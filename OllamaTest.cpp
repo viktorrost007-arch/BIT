@@ -8,12 +8,13 @@ int main() {
 
   cout<< greeting << endl; //BIT
 
+  ofstream("/tmp/say.txt") << textgreeting;
+    system("espeak-ng -v en -f /tmp/say.txt");
+
   checkfirst_time();
   readSettings();
   textgreeting = settings["greeting"];
-
-  ofstream("/tmp/say.txt") << textgreeting;
-    system("espeak-ng -v en -f /tmp/say.txt");
+  system("clear");
 
   history.push_back({ {"role","system"}, {"content", sysprompt} });
   cout<< greeting << endl;
