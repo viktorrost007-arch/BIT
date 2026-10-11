@@ -17,7 +17,7 @@ string greeting = R"(
 ╚═════╝ ╚═╝   ╚═╝
 )";
 
-string textgreeting = " nice to see you again!";
+string textgreeting;
 
 vector<json> history;
 // request headers
@@ -36,6 +36,51 @@ int counter;
 FILE* rec = nullptr;
   
 map <string, string> settings;
+
+bool autohealing = false;
+bool first_time;
+
+void checkfirst_time(){
+    ifstream file("test.wav");
+    if(!file.is_open()){
+        first_time = true;
+        setup();
+    }
+     
+}
+
+void setup(){
+    map <string, string> first_time_settings;
+    
+    textgreeting = "Hi, I am BIT, nice to meet you here! Please fill the settings and we can start! To skip enter exit in first question." ;
+    cout<< "Hi, I am BIT, nice to meet you here! Please fill the settings and we can start! To skip enter exit in first question." << endl;
+    cout<< "You can change them every time you want in settings.txt"<< endl;
+    cout << "Please write your system-prompt in prompt.txt"<< endl << endl;
+    cout<< " Which LLM model do you use in Ollama? (for example qwen2.5:7b)"<< endl;
+    cin >> first_time_settings["ollama_model"];
+    
+    cout << endl << "Where do I have to search your Whisper.cpp? (for example http://192.168.20.4:10300/v1/audio/transcriptions)" << endl;
+    cin >> first_time_settings["whisper_address"];
+    
+    cout << endl << "Where do I have to search your Ollama? ( for example 192.168.20.4:11434)"<< endl;
+    cin >> first_time_settings["ollama_address"];
+
+    cin.ignore(); // сбросил остающийся \n
+    cout << endl << "Which greeeting do you want to set for me?"<< endl;
+    getline(cin,first_time_settings["greeting"]);
+
+    ofstream file("settings.txt");
+    file << "*WELCOME IN THE BETA VERSION OF THE SETTINGS-FILE, PLEASE FOLLOW INSTRUCTIONS BELOW.\n";
+    file << "*please dont use any whitespaces as the first or last symbol of the line,\n";
+    file << "*please also don't change the values after hashtags.\n";
+    file << "*comments are marked with * at the beginning of the line, you can add there whatever you want\n\n";
+
+    for (auto& [key, value] : first_time_settings) {
+    file << "#" << key << "\n" << value << "\n\n";
+     }
+     first_time = false;
+}
+
 
 
 
@@ -66,9 +111,9 @@ string readSysPrompt(const string& syspromptfile){
 ////send function
 
 bool SendToOllama() {
-
+    cout<< "Sending to LLM";
     json request = {
-        {"model",  "qwen2.5:7b"},
+        {"model",  settings["ollama_model"]},
         {"stream", false},
         {"tools", tools},
         {"messages", history}
@@ -79,6 +124,7 @@ bool SendToOllama() {
     cli.set_read_timeout(60, 0);
 
     auto res = cli.Post("/api/chat", request.dump(), "application/json");
+    cout << " \r               " << flush; 
     if (!res) { cerr << "http error\n"; return false; }
 
    
@@ -167,6 +213,9 @@ void readSettings(){
     ifstream file("settings.txt");
     if(!file.is_open()) {
         std::cerr << "CAN'T OPEN settings.txt"<< endl;
+        cout << "There are some sources missing. Start auto-healing?" << endl;
+        autohealing = true; 
+        cout << "Sorry, auto-healing not suppoorted in this version, please enter setup or create file settings.txt at yourself"<< endl;
         return;
         }
     while(getline(file, line)){

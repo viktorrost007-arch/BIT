@@ -6,6 +6,7 @@
 
 int main() {
 
+  checkfirst_time();
   readSettings();
   textgreeting = settings["greeting"];
 
@@ -23,6 +24,7 @@ int main() {
   //cout << uinput<< endl;
  
    if(uinput == "/exit") break;
+   if( uinput == "/setup") setup();
 
     if (uinput.empty()) {
       if (!recording) {

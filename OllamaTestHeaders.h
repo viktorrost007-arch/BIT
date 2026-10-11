@@ -28,7 +28,11 @@ extern string uianswer;
 extern string syspromptfile;
 extern string sysprompt;
 extern string filepath;
+extern bool autohealing;
+extern bool first_time;
 
+void checkfirst_time();
+void setup();
 
 void startRec();
 void stopRec();

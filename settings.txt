@@ -1,6 +1,7 @@
 *WELCOME IN THE BETA VERSION OF THE SETTINGS-FILE, PLEASE FOLLOW INSTRUCTIONS BELOW.
 *please dont use any whitespaces as the first or last symbol of the line,
 *please also don't change the values after hashtags.
+*comments are marked with * at the beginning of the line, you can add there whatever you want
 
 #whisper_address
 http://192.168.20.4:10300/v1/audio/transcriptions
@@ -8,7 +9,10 @@ http://192.168.20.4:10300/v1/audio/transcriptions
 #ollama_address
 192.168.20.4:11434
 
+#ollama_model
+qwen2.5:7b
+
 #greeting
-hi
+nice to see you!
 
 
