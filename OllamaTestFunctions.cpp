@@ -41,7 +41,7 @@ bool autohealing = false;
 bool first_time;
 
 void checkfirst_time(){
-    ifstream file("test.wav");
+    ifstream file("settings.txt");
     if(!file.is_open()){
         first_time = true;
         setup();
@@ -62,14 +62,31 @@ void setup(){
     cout<< "You can change them every time you want in settings.txt"<< endl;
     cout << "Please write your system-prompt in prompt.txt"<< endl << endl;
     
-    cout<< " Which LLM model do you use in Ollama? (for example qwen2.5:7b)"<< endl;
-    cin >> first_time_settings["ollama_model"];
-    
+
+    cout << "Which art of LLM do you use? (ollama for Ollama server, openai for Deepseek/ChatGPT/Claude and others)" << endl;
+    cin >> first_time_settings["llm_type"];
+
+    if(first_time_settings["llm_type"] == "openai"){
+        cout << endl << "Where do I have to search your OpenAI? (for example https://api.openai.com  (WITHOUT /v1/chat/completions !))" << endl;
+        cin >> first_time_settings["openai_address"];
+
+        cout << endl << "Which LLM model do you use in OpenAI? (for example gpt-4o, gpt-4o-mini, gpt-4, gpt-3.5-turbo)" << endl;
+        cin >> first_time_settings["openai_model"];
+
+        cout << endl << "Please enter your OpenAI API key (for example sk-xxxxxxxxxxxxxxxxxxxxxx)" << endl;
+        cin >> first_time_settings["llm_key"];
+    }
+
+    if(first_time_settings["llm_type"] == "ollama"){
+        cout << endl << "Where do I have to search your Ollama? (for example 192.168.20.4:11434)" << endl;
+        cin >> first_time_settings["ollama_address"];
+        cout << endl << "Which LLM model do you use in Ollama? (for example qwen2.5:7b)" << endl;
+        cin >> first_time_settings["ollama_model"];
+    }
+
     cout << endl << "Where do I have to search your Whisper.cpp? (for example http://192.168.20.4:10300/v1/audio/transcriptions)" << endl;
     cin >> first_time_settings["whisper_address"];
     
-    cout << endl << "Where do I have to search your Ollama? ( for example 192.168.20.4:11434)"<< endl;
-    cin >> first_time_settings["ollama_address"];
 
     cin.ignore(); // сбросил остающийся \n
     cout << endl << "Which greeeting do you want to set for me?"<< endl;
@@ -117,30 +134,65 @@ string readSysPrompt(const string& syspromptfile){
 ////send function
 
 bool SendToOllama() {
-    cout<< "Sending to LLM";
+    cout << "Sending to LLM";
+    for(int i; i<3; i++){
+        cout << ".";
+        cout.flush();
+    }
+   
+   
+// считываем параметры моделей (условие да: нет
+
+   bool isOllama = (settings["llm_type"] == "ollama");
+
+    string host  = isOllama ? settings["ollama_address"] : settings["openai_address"];
+    string path  = isOllama ? "/api/chat"             : "/v1/chat/completions";
+    string model = isOllama ? settings["ollama_model"] : settings["openai_model"];
+
+
     json request = {
-        {"model",  settings["ollama_model"]},
-        {"stream", false},
-        {"tools", tools},
+        {"model",    model},
+        {"stream",   false},
+        {"tools",    tools},
         {"messages", history}
     };
-    string cliadress = settings["ollama_address"];
-    // 1. Указываем только БАЗОВЫЙ адрес сервера (куда стучимся по сети)
-    httplib::Client cli(cliadress);
-    cli.set_read_timeout(60, 0);
 
-    auto res = cli.Post("/api/chat", request.dump(), "application/json");
-    cout << " \r               " << flush; 
+
+    httplib::Client cli(host);
+    cli.set_read_timeout(60, 0);
+    if (!isOllama) cli.set_bearer_token_auth(settings["llm_key"]);
+
+
+    auto res = cli.Post(path, request.dump(), "application/json");
+    cout << " \r               " << flush;
+     
+
     if (!res) { cerr << "http error\n"; return false; }
 
-   
-    json msg = json::parse(res->body)["message"];
+    if (res->status != 200) {
+    cerr << "LLM error " << res->status << ": " << res->body << "\n";
+    return false;
+    }
+
+    if (res->body.empty()) { cerr << "empty body\n"; return false; }
+
+
+    json msg; // парсим ответ в зависимости от типа LLM (Ollama или OpenAI)
+    if (isOllama) {
+        msg = json::parse(res->body)["message"];
+    } else {
+        msg = json::parse(res->body)["choices"][0]["message"];
+    }   
+
+
     history.push_back(msg);
 
     if(msg.contains("tool_calls") && !msg["tool_calls"].empty()){
+        
         for(auto& call : msg["tool_calls"]){
             string name = call["function"]["name"];
             json args = call ["function"]["arguments"];
+            args = args.is_string() ? json::parse(args.get<string>()) : args;
             string toolout = runTool(name,args);
             //cout<< name << ">> "<< args;
             history.push_back({
