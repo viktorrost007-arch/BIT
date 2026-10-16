@@ -30,6 +30,7 @@ int main() {
  
    if(uinput == "/exit") break;
    if( uinput == "/setup") setup();
+   if( uinput == "/reset") reset();
 
     if (uinput.empty()) {
       if (!recording) {
@@ -39,6 +40,7 @@ int main() {
         continue;                      // ← выходим, ничего больше не делаем
       } else {
         stopRec();
+        cout << "\r               " << flush << endl << endl;
         recording = false;
 
         string uinput = SendToWhisper();
@@ -66,6 +68,17 @@ int main() {
     system("espeak-ng -v ru -f /tmp/say.txt");
 
   }
+   cout << "Exiting.";
   remove("test.wav");
+  cout << ".";
+  remove("/tmp/say.txt");
+  cout << "."<< endl; 
+  cout << "Goodbye!"<< endl;
+  system("espeak-ng -v en \"goodbye!\"");
+
+  system("clear");
+
+  
+  
   return 0;
 }

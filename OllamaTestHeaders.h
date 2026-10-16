@@ -31,6 +31,7 @@ extern string filepath;
 extern bool autohealing;
 extern bool first_time;
 
+void reset();
 void checkfirst_time();
 void setup();
 

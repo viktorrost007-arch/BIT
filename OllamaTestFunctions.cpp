@@ -15,6 +15,11 @@ string greeting = R"(
 ██╔══██╗██║   ██║
 ██████╔╝██║   ██║  v.1.beta
 ╚═════╝ ╚═╝   ╚═╝
+
+* WELCOME TO THE BETA VERSION OF BIT, PLEASE FOLLOW INSTRUCTIONS BELOW.
+* FOR EXIT PLEASE USE /exit COMMAND INSTEAD OF Ctrl+C, THIS WILL HELP KEEP YOUR BIT STABLE
+* FOR SETUP PLEASE USE /setup COMMAND.
+* FOR RESETING LOCAL SETTINGS PLEASE USE /reset COMMAND, THIS WILL START SETUP AGAIN.
 )";
 
 string textgreeting;
@@ -40,6 +45,15 @@ map <string, string> settings;
 bool autohealing = false;
 bool first_time;
 
+void reset(){
+    cout<< endl<< "Reseting local settings";
+    system("clear");
+    remove("settings.txt");
+    cout<< ".";
+    remove("prompt.txt");
+    cout<< "." << endl;
+    setup();
+}
 void checkfirst_time(){
     ifstream file("settings.txt");
     if(!file.is_open()){
@@ -134,11 +148,6 @@ string readSysPrompt(const string& syspromptfile){
 ////send function
 
 bool SendToOllama() {
-    cout << "Sending to LLM";
-    for(int i; i<3; i++){
-        cout << ".";
-        cout.flush();
-    }
    
    
 // считываем параметры моделей (условие да: нет
@@ -162,6 +171,11 @@ bool SendToOllama() {
     cli.set_read_timeout(60, 0);
     if (!isOllama) cli.set_bearer_token_auth(settings["llm_key"]);
 
+    for(int i = 0; i<3; i++){
+        cout << ".";
+        cout.flush();
+        std::this_thread::sleep_for(std::chrono::milliseconds(250));
+    }
 
     auto res = cli.Post(path, request.dump(), "application/json");
     cout << " \r               " << flush;
@@ -188,7 +202,7 @@ bool SendToOllama() {
     history.push_back(msg);
 
     if(msg.contains("tool_calls") && !msg["tool_calls"].empty()){
-        
+
         for(auto& call : msg["tool_calls"]){
             string name = call["function"]["name"];
             json args = call ["function"]["arguments"];
@@ -203,6 +217,14 @@ bool SendToOllama() {
             cout << "> TOOL"<< " "<< name << endl;
             cout << "> "<< args << endl;
             
+            ofstream log("log.txt", ios::app);
+            time_t now = time(0);
+            log << "TIME: " << ctime(&now);
+            log << "TOOL: " << name << "\n";
+            log << "ARGS: " << args.dump(2) << "\n";
+            log << "OUT:  " << toolout << "\n\n";
+            
+            //log.close();
         }
         return true;
     }
