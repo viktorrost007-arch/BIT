@@ -1,5 +1,8 @@
 #include "OllamaTestHeaders.h"
 
+const string VERSION = "1.0.0";
+
+
 using namespace std;
 using json = nlohmann::json;
 

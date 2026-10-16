@@ -14,7 +14,7 @@
 using namespace std;
 using json = nlohmann::json;
 
-
+extern const string VERSION;
 
 
 extern map <string,string> settings;

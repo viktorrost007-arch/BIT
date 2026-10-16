@@ -1,6 +1,6 @@
 #include "OllamaTestHeaders.h"
 
-
+//VERSION 1.0.0
 
 
 
@@ -40,7 +40,7 @@ int main() {
         continue;                      // ← выходим, ничего больше не делаем
       } else {
         stopRec();
-        cout << "\r               " << flush << endl << endl;
+        //cout << "\r               " << flush << endl << endl;
         recording = false;
 
         string uinput = SendToWhisper();
@@ -73,8 +73,10 @@ int main() {
   cout << ".";
   remove("/tmp/say.txt");
   cout << "."<< endl; 
+  remove("log.txt");
+  cout << "Done."<< endl;
   cout << "Goodbye!"<< endl;
-  system("espeak-ng -v en \"goodbye!\"");
+  system("espeak-ng -v en \"Meet you later!\"");
 
   system("clear");
 
@@ -82,3 +84,4 @@ int main() {
   
   return 0;
 }
+// еще будет выбор языка из настроек чтобы избежать странного акцента при espeak c en
