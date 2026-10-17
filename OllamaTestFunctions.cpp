@@ -355,8 +355,9 @@ void readSettings(){
         if(i == "y" || i == "Y") setup();
         else {
             cout << "You can create settings.txt at yourself, please follow the instructions in the file." << endl;
-            cout << "Please also create prompt.txt with your system-prompt." << endl;
+            cout << "Please also create prompt.txt for your system-prompt." << endl;
             cout << "Exiting..." << endl;
+            system("clear");
             exit(1);
         }
 
