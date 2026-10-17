@@ -26,6 +26,7 @@ string greeting2 = R"(
 * FOR SETUP PLEASE USE /setup COMMAND.
 * FOR RESETING LOCAL SETTINGS PLEASE USE /reset COMMAND, THIS WILL START SETUP AGAIN.
 * UPDATE WITH /update . THGIS WILL RUN update.sh .
+* ALLOW EXECUTING COMMANDS WITHOUTH ASKING WITH /allow, DISALLOW WITH /disallow.
 * PRESS ENTER TO START RECORDING, PRESS ENTER AGAIN TO STOP RECORDING AND SEND AUDIO TO BIT.
 )";
 
@@ -203,6 +204,8 @@ void handleInput() {
    if( uinput == "/setup") setup();
    if( uinput == "/reset") reset();
    if ( uinput == "/update")  update();
+   if ( uinput == "/allow")  allowcommand = true;
+   if ( uinput == "/disallow")  allowcommand = false;
 
     if (uinput.empty()) {
       if (!recording) {
