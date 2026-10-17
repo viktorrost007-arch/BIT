@@ -31,7 +31,7 @@ int main() {
    if(uinput == "/exit") break;
    if( uinput == "/setup") setup();
    if( uinput == "/reset") reset();
-   if ( uinput == "/update")  
+   if ( uinput == "/update")  update();
 
     if (uinput.empty()) {
       if (!recording) {

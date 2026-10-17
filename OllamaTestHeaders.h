@@ -35,6 +35,7 @@ void reset();
 void checkfirst_time();
 void setup();
 void exit();
+void update();
 
 void startRec();
 void stopRec();
