@@ -48,6 +48,56 @@ map <string, string> settings;
 bool autohealing = false;
 bool first_time;
 
+
+
+
+
+
+
+
+
+
+// bool updateAvailable() {
+//     httplib::Client cli("https://raw.githubusercontent.com");
+//     cli.set_read_timeout(10, 0);
+//     auto res = cli.Get("/bit-llm/bit/main/VERSION.txt");
+//     if (!res || res->status != 200) {
+//         cerr << "Failed to check for updates\n";
+//         return false;
+//     }
+//     string latestVersion = res->body;
+//     return latestVersion != VERSION;
+// }
+
+void update(){
+    exit();
+    cout<< "Start updating."<< endl;
+    system("chmod +x update.sh");
+    cout << ".";
+    system("clear");
+    cout << "Updating..."<< endl;
+    system("./update.sh");
+    
+}
+
+
+
+void exit(){
+     cout << "Exiting.";
+  remove("test.wav");
+  cout << ".";
+  remove("/tmp/say.txt");
+  cout << "."<< endl; 
+  remove("log.txt");
+  cout << "Done."<< endl;
+  cout << "Goodbye!"<< endl;
+  system("espeak-ng -v en \"Meet you later!\"");
+
+  system("clear");
+}
+
+
+
 void reset(){
     cout<< endl<< "Reseting local settings";
     system("clear");

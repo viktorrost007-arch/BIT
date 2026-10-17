@@ -69,18 +69,7 @@ int main() {
     system("espeak-ng -v ru -f /tmp/say.txt");
 
   }
-   cout << "Exiting.";
-  remove("test.wav");
-  cout << ".";
-  remove("/tmp/say.txt");
-  cout << "."<< endl; 
-  remove("log.txt");
-  cout << "Done."<< endl;
-  cout << "Goodbye!"<< endl;
-  system("espeak-ng -v en \"Meet you later!\"");
-
-  system("clear");
-
+exit();
   
   
   return 0;

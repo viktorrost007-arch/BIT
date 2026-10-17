@@ -34,6 +34,7 @@ extern bool first_time;
 void reset();
 void checkfirst_time();
 void setup();
+void exit();
 
 void startRec();
 void stopRec();
