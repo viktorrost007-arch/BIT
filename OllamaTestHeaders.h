@@ -1,6 +1,8 @@
 #pragma once
 
 #include <iostream>
+#include <sys/select.h>
+#include <unistd.h>
 #include <string>
 #include <vector>
 #include <fstream>
@@ -30,6 +32,9 @@ extern string sysprompt;
 extern string filepath;
 extern bool autohealing;
 extern bool first_time;
+extern string greeting2;
+extern string point;
+extern bool allowcommand;
 
 void reset();
 void checkfirst_time();
@@ -37,6 +42,8 @@ void setup();
 void exit();
 void update();
 
+void handleInput();
+bool checkUserInput();
 void startRec();
 void stopRec();
 

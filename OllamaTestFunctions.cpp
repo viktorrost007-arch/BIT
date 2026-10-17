@@ -18,13 +18,18 @@ string greeting = R"(
 ██╔══██╗██║   ██║
 ██████╔╝██║   ██║  v.1.beta
 ╚═════╝ ╚═╝   ╚═╝
+)";
 
+string greeting2 = R"(
 * WELCOME TO THE BETA VERSION OF BIT, PLEASE FOLLOW INSTRUCTIONS BELOW.
 * FOR EXIT PLEASE USE /exit COMMAND INSTEAD OF Ctrl+C, THIS WILL HELP KEEP YOUR BIT STABLE
 * FOR SETUP PLEASE USE /setup COMMAND.
 * FOR RESETING LOCAL SETTINGS PLEASE USE /reset COMMAND, THIS WILL START SETUP AGAIN.
 * UPDATE WITH /update . THGIS WILL RUN update.sh .
+* PRESS ENTER TO START RECORDING, PRESS ENTER AGAIN TO STOP RECORDING AND SEND AUDIO TO BIT.
 )";
+
+string point = "  ██|";
 
 string textgreeting;
 
@@ -48,7 +53,7 @@ map <string, string> settings;
 
 bool autohealing = false;
 bool first_time;
-
+bool allowcommand = false;
 
 
 
@@ -122,13 +127,14 @@ void setup(){
     
     textgreeting = "Hi, I am BIT, nice to meet you here! Please fill the settings and we can start! " ;
     
-     ofstream("/tmp/say.txt") << textgreeting;
-    system("espeak-ng -v en -f /tmp/say.txt");
-
-
     cout<< "Hi, I am BIT, nice to meet you here! Please fill out the settings and we can start! " << endl;
     cout<< "You can change them every time you want in settings.txt"<< endl;
     cout << "Please write your system-prompt in prompt.txt"<< endl << endl;
+
+
+     ofstream("/tmp/say.txt") << textgreeting;
+     system("espeak-ng -v en -f /tmp/say.txt");
+
     
 
     cout << "Which art of LLM do you use? (ollama for Ollama server, openai for Deepseek/ChatGPT/Claude and others)" << endl;
@@ -183,6 +189,82 @@ void stopRec() {
     system("pkill -INT arecord");
     if (rec) { pclose(rec); rec = nullptr; }
 }
+
+
+
+
+
+void handleInput() {
+    while (getline(cin, uinput)) {
+
+  //cout << uinput<< endl;
+ 
+   if(uinput == "/exit") break;
+   if( uinput == "/setup") setup();
+   if( uinput == "/reset") reset();
+   if ( uinput == "/update")  update();
+
+    if (uinput.empty()) {
+      if (!recording) {
+        startRec();
+        recording = true;
+        cout << "rec...\n";
+        continue;                      // ← выходим, ничего больше не делаем
+      } else {
+        stopRec();
+        //cout << "\r               " << flush << endl << endl;
+        recording = false;
+
+        string uinput = SendToWhisper();
+        cout << "you> " << uinput  << "\n";
+        if (uinput.empty()) continue;
+
+        history.push_back({ {"role","user"}, {"content", uinput} });
+        while(SendToOllama()&& !checkUserInput()){}
+      }
+    } else {
+      history.push_back({ {"role","user"}, {"content", uinput} });
+      
+      while(SendToOllama() && !checkUserInput()){}
+        
+     if (checkUserInput()) {
+    cout << "[Interrupted by User]\n";
+    uianswer = "";
+    }
+
+
+    //cout << "BIT> \"" <<uianswer << """" << "\"\n";
+    cout << "BIT>  " << uianswer << " " << endl;
+    // string speechcommand = "espeak-ng -v ru \"" + uianswer + "\"";
+    // system(speechcommand.c_str());
+    ofstream("/tmp/say.txt") << uianswer;
+    system("espeak-ng -v ru -f /tmp/say.txt");
+
+  }
+}
+}
+
+
+bool checkUserInput() {
+    fd_set readfds;
+    struct timeval timeout;
+    
+    FD_ZERO(&readfds);
+    FD_SET(STDIN_FILENO, &readfds); // Следим за клавиатурой (дескриптор 0)
+
+    // Ставим таймаут 0 секунд 0 микросекунд (проверить прямо сейчас, не ждать)
+    timeout.tv_sec = 0;
+    timeout.tv_usec = 0;
+
+    // select возвращает > 0, если в буфере есть данные
+    int result = select(STDIN_FILENO + 1, &readfds, NULL, NULL, &timeout);
+    
+    if (result > 0) {
+        return true; // Пользователь что-то нажал!
+    }
+    return false; // Ввод пуст
+}
+
 
 //////sysprompt
 
@@ -261,6 +343,21 @@ bool SendToOllama() {
             string name = call["function"]["name"];
             json args = call ["function"]["arguments"];
             args = args.is_string() ? json::parse(args.get<string>()) : args;
+
+
+            cout << "> TOOL"<< " "<< name << endl;
+            cout << "> "<< args << endl;
+
+            if(!allowcommand){
+                cout<< endl<< "ALLOW THIS COMMAND? (y/n) "<< endl;
+                string answer;
+                cin >> answer;
+                if(answer != "y" && answer != "Y"){
+                    cout << "Command not allowed, skipping..." << endl;
+                    continue;
+                }
+            else{
+                
             string toolout = runTool(name,args);
             //cout<< name << ">> "<< args;
             history.push_back({
@@ -279,14 +376,18 @@ bool SendToOllama() {
             log << "OUT:  " << toolout << "\n\n";
             
             //log.close();
+        
+            }
+            return true;
         }
-        return true;
     }
+}
     
     uianswer = msg["content"];
     
     return false;
 
+    
 }
 
 
