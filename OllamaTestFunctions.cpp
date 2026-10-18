@@ -401,7 +401,7 @@ bool SendToOllama() {
                     cout << "Command not allowed, skipping..." << endl;
                     continue;
                 }
-            
+            }
                 
             string toolout = runTool(name,args);
             //cout<< name << ">> "<< args;
@@ -424,7 +424,7 @@ bool SendToOllama() {
             
             
             
-        } //allowcommand
+       
     }   //for
     return true;
 
