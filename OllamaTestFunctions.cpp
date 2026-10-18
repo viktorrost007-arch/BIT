@@ -261,12 +261,13 @@ void handleInput() {
       }
     } else {
       history.push_back({ {"role","user"}, {"content", uinput} });
+       tcflush(STDIN_FILENO, TCIFLUSH);
         is_thinking = true;
         while(SendToOllama() ){
             
             if (checkUserInput() ) {
                 cout << colors["RED"] << "[Interrupted by User]" << colors["RESET"] << "\n";
-                uianswer = "";
+                //uianswer = "";
                 break;
             }
         }
