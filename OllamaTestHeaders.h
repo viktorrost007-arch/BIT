@@ -37,6 +37,7 @@ extern string greeting2;
 extern string point;
 extern bool allowcommand;
 extern bool is_thinking;
+extern map <string, string> colors;
 
 
 void reset();

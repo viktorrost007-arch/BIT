@@ -19,9 +19,11 @@ string greeting = R"(
 ██╔══██╗██║   ██║
 ██████╔╝██║   ██║  v.1.beta
 ╚═════╝ ╚═╝   ╚═╝
+
 )";
 
 string greeting2 = R"(
+
 * WELCOME TO THE BETA VERSION OF BIT, PLEASE FOLLOW INSTRUCTIONS BELOW.
 * FOR EXIT PLEASE USE /exit COMMAND INSTEAD OF Ctrl+C, THIS WILL HELP KEEP YOUR BIT STABLE
 * FOR SETUP PLEASE USE /setup COMMAND.
@@ -32,6 +34,16 @@ string greeting2 = R"(
 )";
 
 string point = "  ██|";
+
+map<string, string> colors = {
+    {"RED", "\033[31m"},
+    {"GREEN", "\033[32m"},
+    {"YELLOW", "\033[33m"},
+    {"BLUE", "\033[34m"},
+    {"RESET", "\033[0m"}
+};
+
+//colors.insert({"RED", "\033[31m"}); или emplace НО ТОЛЬКО ВНУТРИ ФУНКЦИЙ!
 
 string textgreeting;
 
@@ -107,6 +119,10 @@ void exit(){
 
 
 void reset(){
+    cout << colors["RED"]<< "DO YOU REALLY WANT TO DELTE ALL YOUR PERSONAL SETTINGS?" << colors["YELLOW"] << " (y/n) " << colors["RESET"] << endl;
+    string tmp;
+    cin >> tmp;
+    if(tmp == "y" || tmp == "Y"){
     cout<< endl<< "Reseting local settings";
     system("clear");
     remove("settings.txt");
@@ -114,6 +130,10 @@ void reset(){
     remove("prompt.txt");
     cout<< "." << endl;
     setup();
+    }
+    else {
+        cout << "Reset canceled." << endl;
+    }
 }
 void checkfirst_time(){
     ifstream file("settings.txt");
@@ -129,7 +149,7 @@ void setup(){
     
     textgreeting = "Hi, I am BIT, nice to meet you here! Please fill the settings and we can start! " ;
     
-    cout<< "Hi, I am BIT, nice to meet you here! Please fill out the settings and we can start! " << endl;
+    cout<< colors["GREEN"]<< "Hi, I am BIT, nice to meet you here! Please fill out the settings and we can start! "<< colors["RESET"] << endl;
     cout<< "You can change them every time you want in settings.txt"<< endl;
     cout << "Please write your system-prompt in prompt.txt"<< endl << endl;
 
@@ -139,7 +159,7 @@ void setup(){
 
     
 
-    cout << "Which art of LLM do you use? (ollama for Ollama server, openai for Deepseek/ChatGPT/Claude and others)" << endl;
+    cout << "Which art of LLM do you use? ("<< colors["YELLOW"] << "ollama"<< colors["RESET"] << " for Ollama server, " << colors["YELLOW"] << "openai" << colors["RESET"] << " for Deepseek/ChatGPT/Claude and others)" << endl;
     cin >> first_time_settings["llm_type"];
 
     if(first_time_settings["llm_type"] == "openai"){
@@ -165,7 +185,7 @@ void setup(){
     
 
     cin.ignore(); // сбросил остающийся \n
-    cout << endl << "Which greeeting do you want to set for me?"<< endl;
+    cout << endl << "Which greeeting do you want to set for me? (I will say it every time you will start me)"<< endl;
     getline(cin,first_time_settings["greeting"]);
 
     ofstream file("settings.txt");
@@ -205,8 +225,16 @@ void handleInput() {
    if( uinput == "/setup") setup();
    if( uinput == "/reset") reset();
    if ( uinput == "/update")  update();
-   if ( uinput == "/allow")  allowcommand = true;
-   if ( uinput == "/disallow")  allowcommand = false;
+   if ( uinput == "/allow")  {
+       allowcommand = true;
+       cout << colors["YELLOW"] << "All commands are allowed now" << colors["RESET"] << endl;
+       uinput = "go on you are allowed to do all commands without asking, dont forget to explain what you did when you are done and be carefull with users system. ";
+   }
+   if ( uinput == "/disallow")  {
+       allowcommand = false;
+        cout << colors["GREEN"] << "All commands are disallowed now, BIT will ask you to execute them" << colors["RESET"] << endl;
+        uinput = "executing commands without asking is not allowed now, please ask the user for allowing it, explain why you need it";
+   }
 
     if (uinput.empty()) {
       if (!recording) {
@@ -240,7 +268,7 @@ void handleInput() {
     }
 
     //cout << "BIT> \"" <<uianswer << """" << "\"\n";
-    cout << "BIT>  " << uianswer << " " << endl;
+    cout << colors["BLUE"] << "BIT>  "  << colors["RESET"] << uianswer  << endl;
     // string speechcommand = "espeak-ng -v ru \"" + uianswer + "\"";
     // system(speechcommand.c_str());
     ofstream("/tmp/say.txt") << uianswer;
@@ -280,7 +308,7 @@ string readSysPrompt(const string& syspromptfile){
     ifstream file(syspromptfile);
 
     if(!file.is_open()) {
-        std::cerr << "CAN'T OPEN"<< syspromptfile << endl;
+        std::cerr << colors ["RED"] << "CAN'T OPEN"<< syspromptfile << colors["RESET"] << endl;
     }
 
     stringstream buffer;
@@ -328,7 +356,7 @@ bool SendToOllama() {
     if (!res) { cerr << "http error\n"; return false; }
 
     if (res->status != 200) {
-    cerr << "LLM error " << res->status << ": " << res->body << "\n";
+    cerr<< colors["RED"] << "LLM error " << res->status << ": " << res->body << "\n" << colors["RESET"];
     return false;
     }
 
@@ -353,11 +381,11 @@ bool SendToOllama() {
             args = args.is_string() ? json::parse(args.get<string>()) : args;
 
 
-            cout << "> TOOL"<< " "<< name << endl;
+            cout<< colors["BLUE"]<< "> TOOL"<< " "<< name<< colors["RESET"] << endl;
             cout << "> "<< args << endl;
 
             if(!allowcommand){
-                cout<< endl<< "ALLOW THIS COMMAND? (y/n) "<< endl;
+                cout<< endl<< colors["YELLOW"] << "ALLOW THIS COMMAND? (y/n) "<< colors["RESET"] << endl;
                 string answer;
                 getline(cin, answer);
                 if(answer != "y" && answer != "Y"){
