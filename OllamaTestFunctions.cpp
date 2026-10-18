@@ -17,7 +17,7 @@ string greeting = R"(
 ██╔══██╗██║╚══██╔══╝
 ██████╔╝██║   ██║
 ██╔══██╗██║   ██║
-██████╔╝██║   ██║  \033[33m/v.1.beta
+██████╔╝██║   ██║  v.1.beta
 ╚═════╝ ╚═╝   ╚═╝
 
 )";
@@ -255,20 +255,26 @@ void handleInput() {
 
         history.push_back({ {"role","user"}, {"content", uinput} });
         tcflush(STDIN_FILENO, TCIFLUSH);
+        is_thinking = true;
         while(SendToOllama()&& !checkUserInput()){}
+        is_thinking = false;
       }
     } else {
       history.push_back({ {"role","user"}, {"content", uinput} });
-      
-        while(SendToOllama() && !checkUserInput()){}
+        is_thinking = true;
+        while(SendToOllama() ){
+            
+            if (checkUserInput() ) {
+                cout << colors["RED"] << "[Interrupted by User]" << colors["RESET"] << "\n";
+                uianswer = "";
+                break;
+            }
+        }
         is_thinking = false;
         
-        if (checkUserInput() || is_thinking == true) {
-        cout << "[Interrupted by User]\n";
-        uianswer = "";
-        }
+        
     }
-
+    
     //cout << "BIT> \"" <<uianswer << """" << "\"\n";
     cout << colors["BLUE"] << "BIT>  "  << colors["RESET"] << uianswer  << endl;
     // string speechcommand = "espeak-ng -v ru \"" + uianswer + "\"";
@@ -282,7 +288,7 @@ void handleInput() {
 
 
 bool checkUserInput() {
-    if(is_thinking) return false; 
+    if(!is_thinking) return false; 
     fd_set readfds;
     struct timeval timeout;
     
@@ -344,11 +350,11 @@ bool SendToOllama() {
     httplib::Client cli(host);
     cli.set_read_timeout(60, 0);
     if (!isOllama) cli.set_bearer_token_auth(settings["llm_key"]);
-
+    cout << "Thinking"<< endl;
     for(int i = 0; i<3; i++){
         cout << ".";
         cout.flush();
-        std::this_thread::sleep_for(std::chrono::milliseconds(250));
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
     }
 
     auto res = cli.Post(path, request.dump(), "application/json");
@@ -394,7 +400,7 @@ bool SendToOllama() {
                     cout << "Command not allowed, skipping..." << endl;
                     continue;
                 }
-            else {
+            
                 
             string toolout = runTool(name,args);
             //cout<< name << ">> "<< args;
@@ -415,7 +421,7 @@ bool SendToOllama() {
             
             //log.close();
             
-            } //else
+            
             
         } //allowcommand
     }   //for
