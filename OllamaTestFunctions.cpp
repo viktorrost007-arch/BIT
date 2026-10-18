@@ -233,7 +233,7 @@ void handleInput() {
         while(SendToOllama() && !checkUserInput()){}
         is_thinking = false;
         
-        if (checkUserInput()) {
+        if (checkUserInput() || is_thinking == true) {
         cout << "[Interrupted by User]\n";
         uianswer = "";
         }

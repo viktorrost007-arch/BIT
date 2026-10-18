@@ -9,14 +9,16 @@ int main() {
   cout<< greeting << endl; //BIT
 
   checkfirst_time();
+  system("clear");
+  cout << greeting << endl;
+  cout << greeting2 << endl;
   readSettings();
-  cout << greeting2 << endl; 
+  //cout << greeting2 << endl; 
   
   textgreeting = settings["greeting"];
-  system("clear");
+  
 
   history.push_back({ {"role","system"}, {"content", sysprompt} });
-  cout<< greeting << endl;
   ofstream("/tmp/say.txt") << textgreeting;
     system("espeak-ng -v en -f /tmp/say.txt");
   // std::string command = "espeak-ng -v en \"" + textgreeting+ "\"";
