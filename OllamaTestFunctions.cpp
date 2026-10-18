@@ -114,6 +114,7 @@ void myexit(){
   system("espeak-ng -v en \"Meet you later!\"");
 
   system("clear");
+  exit(0);
 }
 
 
