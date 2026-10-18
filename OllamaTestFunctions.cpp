@@ -103,6 +103,7 @@ void update(){
 
 
 void myexit(){
+  uinput ="";
   cout << colors["RED"] << "Exiting." << colors["RESET"] << endl;
   remove("test.wav");
   cout << ".";
@@ -114,7 +115,7 @@ void myexit(){
   system("espeak-ng -v en \"Meet you later!\"");
 
   system("clear");
-  exit(0);
+  std::exit(0);
 }
 
 
