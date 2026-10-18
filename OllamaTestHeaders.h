@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <sys/select.h>
+#include <termios.h>
 #include <unistd.h>
 #include <string>
 #include <vector>
@@ -35,6 +36,8 @@ extern bool first_time;
 extern string greeting2;
 extern string point;
 extern bool allowcommand;
+extern bool is_thinking;
+
 
 void reset();
 void checkfirst_time();

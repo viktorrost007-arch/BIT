@@ -10,7 +10,8 @@ string uinput;
 string uianswer;
 
 bool recording = false;
-
+bool is_thinking = false;
+     
 string greeting = R"(
 ██████╗ ██╗████████╗
 ██╔══██╗██║╚══██╔══╝
@@ -223,18 +224,20 @@ void handleInput() {
         if (uinput.empty()) continue;
 
         history.push_back({ {"role","user"}, {"content", uinput} });
+        tcflush(STDIN_FILENO, TCIFLUSH);
         while(SendToOllama()&& !checkUserInput()){}
       }
     } else {
       history.push_back({ {"role","user"}, {"content", uinput} });
       
-      while(SendToOllama() && !checkUserInput()){}
+        while(SendToOllama() && !checkUserInput()){}
+        is_thinking = false;
         
-     if (checkUserInput()) {
-    cout << "[Interrupted by User]\n";
-    uianswer = "";
+        if (checkUserInput()) {
+        cout << "[Interrupted by User]\n";
+        uianswer = "";
+        }
     }
-
 
     //cout << "BIT> \"" <<uianswer << """" << "\"\n";
     cout << "BIT>  " << uianswer << " " << endl;
@@ -243,12 +246,13 @@ void handleInput() {
     ofstream("/tmp/say.txt") << uianswer;
     system("espeak-ng -v ru -f /tmp/say.txt");
 
-  }
+  
 }
 }
 
 
 bool checkUserInput() {
+    if(is_thinking) return false; 
     fd_set readfds;
     struct timeval timeout;
     
@@ -263,6 +267,7 @@ bool checkUserInput() {
     int result = select(STDIN_FILENO + 1, &readfds, NULL, NULL, &timeout);
     
     if (result > 0) {
+        tcflush(STDIN_FILENO, TCIFLUSH);
         return true; // Пользователь что-то нажал!
     }
     return false; // Ввод пуст
@@ -354,12 +359,12 @@ bool SendToOllama() {
             if(!allowcommand){
                 cout<< endl<< "ALLOW THIS COMMAND? (y/n) "<< endl;
                 string answer;
-                cin >> answer;
+                getline(cin, answer);
                 if(answer != "y" && answer != "Y"){
                     cout << "Command not allowed, skipping..." << endl;
                     continue;
                 }
-            else{
+            else {
                 
             string toolout = runTool(name,args);
             //cout<< name << ">> "<< args;
@@ -379,18 +384,18 @@ bool SendToOllama() {
             log << "OUT:  " << toolout << "\n\n";
             
             //log.close();
-        
-            }
-            return true;
-        }
-    }
-}
+            
+            } //else
+            
+        } //allowcommand
+    }   //for
+    return true;
+
+}// message contains
     
     uianswer = msg["content"];
     
-    return false;
-
-    
+    return false;   
 }
 
 
