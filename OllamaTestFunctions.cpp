@@ -23,13 +23,15 @@ string greeting = R"(
 )";
 
 string greeting2 = 
-    "\n* WELCOME TO THE BETA VERSION OF BIT, PLEASE FOLLOW INSTRUCTIONS BELOW.\n"
+    "\n* WELCOME TO THE BETA VERSION OF BIT, PLEASE FOLLOW INSTRUCTIONS BELOW.\n\n"
     "* FOR EXIT PLEASE USE \033[33m/exit\033[0m COMMAND INSTEAD OF Ctrl+C, THIS WILL HELP KEEP YOUR BIT STABLE\n"
     "* FOR SETUP PLEASE USE \033[33m/setup\033[0m COMMAND.\n"
     "* FOR RESETING LOCAL SETTINGS PLEASE USE \033[33m/reset\033[0m COMMAND, THIS WILL START SETUP AGAIN.\n"
     "* UPDATE WITH \033[33m/update\033[0m . THIS WILL RUN update.sh .\n"
+    "* UPDATE FROM LAST COMMIT WITH \033[33m/update-from-repo\033[0m . THIS WILL RUN update-from-repo.sh . This version is not production ready, I dont recommend to do this.\n"
     "* ALLOW EXECUTING COMMANDS WITHOUT ASKING WITH \033[33m/allow\033[0m, DISALLOW WITH \033[33m/disallow\033[0m.\n"
-    "* PRESS ENTER TO START RECORDING, PRESS ENTER AGAIN TO STOP RECORDING AND SEND AUDIO TO BIT.\n";
+    "* PRESS ENTER TO START RECORDING, PRESS ENTER AGAIN TO STOP RECORDING AND SEND AUDIO TO BIT.\n"
+    "* FOR HELP PLEASE USE \033[33m/help\033[0m COMMAND.\n";
 
 string point = "  ██|";
 
@@ -88,7 +90,7 @@ bool allowcommand = false;
 // }
 
 void update(){
-    exit();
+    myexit();
     cout<< "Start updating."<< endl;
     system("chmod +x update.sh");
     cout << ".";
@@ -100,7 +102,7 @@ void update(){
 
 
 
-void exit(){
+void myexit(){
   cout << colors["RED"] << "Exiting." << colors["RESET"] << endl;
   remove("test.wav");
   cout << ".";
@@ -219,7 +221,7 @@ void handleInput() {
 
   //cout << uinput<< endl;
  
-   if(uinput == "/exit") exit(); 
+   if(uinput == "/exit") myexit(); 
    if( uinput == "/setup") setup();
    if( uinput == "/reset") reset();
    if ( uinput == "/update")  update();
@@ -236,6 +238,24 @@ void handleInput() {
         uinput ="";
         continue;
         //uinput = "executing commands without asking is not allowed now, please ask the user for allowing it, explain why you need it";
+   }
+   if (uinput == "/update-from-repo") {
+        system("chmod +x update-from-repo.sh");
+        system("./update-from-repo.sh");
+        myexit();
+   }
+   if( uinput == "/help") {
+       cout << colors["YELLOW"] << "Available commands:\n"
+            << "/exit - exit the program\n"
+            << "/setup - run setup again\n"
+            << "/reset - reset local settings and run setup again\n"
+            << "/update - update the program from the release\n"
+            << "/update-from-repo - update from the last commit\n"
+            << "/allow - allow executing commands without asking\n"
+            << "/disallow - disallow executing commands without asking\n"
+            << "/help - show this help message" << colors["RESET"] << endl;
+        uinput = "";
+        continue;
    }
 
     if (uinput.empty()) {

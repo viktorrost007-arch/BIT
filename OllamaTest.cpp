@@ -27,7 +27,7 @@ int main() {
   cout<< "What do you wanna ask?"<< endl;
 
   handleInput();
-exit();
+myexit();
   
   
   return 0;

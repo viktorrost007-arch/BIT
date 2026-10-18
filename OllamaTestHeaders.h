@@ -43,7 +43,7 @@ extern map <string, string> colors;
 void reset();
 void checkfirst_time();
 void setup();
-void exit();
+void myexit();
 void update();
 
 void handleInput();
