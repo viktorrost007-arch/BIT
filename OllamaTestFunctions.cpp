@@ -17,21 +17,19 @@ string greeting = R"(
 ██╔══██╗██║╚══██╔══╝
 ██████╔╝██║   ██║
 ██╔══██╗██║   ██║
-██████╔╝██║   ██║  v.1.beta
+██████╔╝██║   ██║  \033[33m/v.1.beta
 ╚═════╝ ╚═╝   ╚═╝
 
 )";
 
-string greeting2 = R"(
-
-* WELCOME TO THE BETA VERSION OF BIT, PLEASE FOLLOW INSTRUCTIONS BELOW.
-* FOR EXIT PLEASE USE /exit COMMAND INSTEAD OF Ctrl+C, THIS WILL HELP KEEP YOUR BIT STABLE
-* FOR SETUP PLEASE USE /setup COMMAND.
-* FOR RESETING LOCAL SETTINGS PLEASE USE /reset COMMAND, THIS WILL START SETUP AGAIN.
-* UPDATE WITH /update . THGIS WILL RUN update.sh .
-* ALLOW EXECUTING COMMANDS WITHOUTH ASKING WITH /allow, DISALLOW WITH /disallow.
-* PRESS ENTER TO START RECORDING, PRESS ENTER AGAIN TO STOP RECORDING AND SEND AUDIO TO BIT.
-)";
+string greeting2 = 
+    "\n* WELCOME TO THE BETA VERSION OF BIT, PLEASE FOLLOW INSTRUCTIONS BELOW.\n"
+    "* FOR EXIT PLEASE USE \033[33m/exit\033[0m COMMAND INSTEAD OF Ctrl+C, THIS WILL HELP KEEP YOUR BIT STABLE\n"
+    "* FOR SETUP PLEASE USE \033[33m/setup\033[0m COMMAND.\n"
+    "* FOR RESETING LOCAL SETTINGS PLEASE USE \033[33m/reset\033[0m COMMAND, THIS WILL START SETUP AGAIN.\n"
+    "* UPDATE WITH \033[33m/update\033[0m . THIS WILL RUN update.sh .\n"
+    "* ALLOW EXECUTING COMMANDS WITHOUT ASKING WITH \033[33m/allow\033[0m, DISALLOW WITH \033[33m/disallow\033[0m.\n"
+    "* PRESS ENTER TO START RECORDING, PRESS ENTER AGAIN TO STOP RECORDING AND SEND AUDIO TO BIT.\n";
 
 string point = "  ██|";
 
@@ -103,7 +101,7 @@ void update(){
 
 
 void exit(){
-     cout << "Exiting.";
+  cout << colors["RED"] << "Exiting." << colors["RESET"] << endl;
   remove("test.wav");
   cout << ".";
   remove("/tmp/say.txt");
@@ -221,19 +219,23 @@ void handleInput() {
 
   //cout << uinput<< endl;
  
-   if(uinput == "/exit") break;
+   if(uinput == "/exit") exit(); 
    if( uinput == "/setup") setup();
    if( uinput == "/reset") reset();
    if ( uinput == "/update")  update();
    if ( uinput == "/allow")  {
        allowcommand = true;
        cout << colors["YELLOW"] << "All commands are allowed now" << colors["RESET"] << endl;
-       uinput = "go on you are allowed to do all commands without asking, dont forget to explain what you did when you are done and be carefull with users system. ";
+       uinput = "";
+       continue;
+       //uinput = "go on you are allowed to do all commands without asking, dont forget to explain what you did when you are done and be carefull with users system. ";
    }
    if ( uinput == "/disallow")  {
        allowcommand = false;
         cout << colors["GREEN"] << "All commands are disallowed now, BIT will ask you to execute them" << colors["RESET"] << endl;
-        uinput = "executing commands without asking is not allowed now, please ask the user for allowing it, explain why you need it";
+        uinput ="";
+        continue;
+        //uinput = "executing commands without asking is not allowed now, please ask the user for allowing it, explain why you need it";
    }
 
     if (uinput.empty()) {
