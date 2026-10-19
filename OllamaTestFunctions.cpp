@@ -10,6 +10,7 @@ string uianswer;
 
 bool recording = false;
 bool is_thinking = false;
+bool textgreeting2_enabled = false;
 
 string greeting = R"(
 ██████╗ ██╗████████╗
@@ -45,6 +46,7 @@ map<string, string> colors = {
 // colors.insert({"RED", "\033[31m"}); или emplace НО ТОЛЬКО ВНУТРИ ФУНКЦИЙ!
 
 string textgreeting;
+
 
 vector<json> history;
 // request headers
