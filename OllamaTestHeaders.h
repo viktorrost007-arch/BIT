@@ -34,10 +34,12 @@ extern string filepath;
 extern bool autohealing;
 extern bool first_time;
 extern string greeting2;
+extern string greeting3;
 extern string point;
 extern bool allowcommand;
 extern bool is_thinking;
 extern map <string, string> colors;
+extern bool textgreeting2_enabled;
 
 
 void reset();

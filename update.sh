@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#Искренне извиняюсь но такого опыта написания скриптов как у нейронки у меня нет поэтому дал ей тезисы что должно быть а потом лапками правил и добавлял по подобию
+
 # Приветствие
 read -p "Вы уверены, что хотите обновить BIT? (y/n): " CONFIRM
 if [[ "$CONFIRM" != "y" && "$CONFIRM" != "Y" ]]; then
@@ -37,10 +39,10 @@ curl -fsSL "$B/README.md"               -o README.md      || { echo "сбой"; 
 curl -fsSL "$B/update.sh"               -o update.sh.new  || { echo "сбой"; rm -f a.cpp b.cpp c.h json.hpp httplib.h update.sh.new tools.json; exit 1; }
 
 echo "Компилирую..."
-g++ -std=c++17 -O2 -pthread a.cpp b.cpp -o ollamatest.new
+g++ -std=c++17 -O2 -pthread a.cpp b.cpp -o bit.new
 if [ $? -ne 0 ]; then
     echo "ОШИБКА СБОРКИ! Старая версия оставлена рабочей."
-    rm -f a.cpp b.cpp c.h json.hpp httplib.h update.sh.new tools.json ollamatest.new
+    rm -f a.cpp b.cpp c.h json.hpp httplib.h update.sh.new tools.json bit.new
     exit 1
 fi
 
@@ -55,20 +57,34 @@ chmod +x update.sh
 if [ -f ollamatest ]; then
     mv ollamatest ollamatest.bak
 fi
-mv ollamatest.new ollamatest
+mv bit.new ollamatest
 chmod +x ollamatest
 
-# Используем $'\033[32m' для зеленого цвета в bash
-echo -e "\033[32mГотово, версия $TAG\033[0m"
+echo -e "\033[32m Готово, версия $TAG\033[0m"
 echo "Старая версия сохранена как ollamatest.bak"
-echo "Не забывайте заходить на GitHub: в новых версиях могут быть новые файлы."
+echo -e "\033[32m Не забывайте заходить на GitHub: в новых версиях могут быть новые файлы. \033[0m"
 
-read -p $'\033[32mЗапустить новую версию BIT? (y/n): \033[0m' CONFIRM
-if [[ "$CONFIRM" == "y" || "$CONFIRM" == "Y" ]]; then
-    echo "Приятного пользования новой версией! При ошибках скачайте версию с GitHub."
+# --- УСТАНОВКА В СИСТЕМУ ---
+read -p $'\033[32m Установить/обновить BIT как глобальную команду (bit)? (y/n): \033[0m' INSTALL
+if [[ "$INSTALL" == "y" || "$INSTALL" == "Y" ]]; then
+    echo "Для установки требуются права администратора (sudo):"
+    sudo cp ollamatest /usr/local/bin/bit
+    sudo chmod +x /usr/local/bin/bit
+    echo -e "\033[32m Готово! Теперь вы можете запускать BIT из любой папки, просто написав: bit \033[0m"
+fi
+
+# --- ЗАПУСК ---
+read -p $'\033[32m Запустить новую версию BIT прямо сейчас? (y/n): \033[0m' RUN_NOW
+if [[ "$RUN_NOW" == "y" || "$RUN_NOW" == "Y" ]]; then
+    echo "Приятного пользования новой версией!"
     clear
-    ./ollamatest
+    # Проверяем, установлена ли глобальная команда, чтобы запустить её
+    if command -v bit &> /dev/null; then
+        bit
+    else
+        ./ollamatest
+    fi
 else
-    echo "Вы можете запустить новую версию позже, введя ./ollamatest"
+    echo "Вы можете запустить новую версию позже, введя ./ollamatest (или bit, если установили)"
     exit 0
 fi

@@ -1,6 +1,6 @@
 #include "OllamaTestHeaders.h"
 
-//VERSION 1.0.0
+//VERSION 1.0.3
 
 
 
@@ -11,7 +11,11 @@ int main() {
   checkfirst_time();
   system("clear");
   cout << greeting << endl;
-  cout << greeting2 << endl;
+  cout << greeting3 << endl;
+  if(textgreeting2_enabled){
+    cout << greeting2 << endl;
+    textgreeting2_enabled = false;
+  }
   readSettings();
   //cout << greeting2 << endl; 
   
