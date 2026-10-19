@@ -153,7 +153,7 @@ void setup()
     ofstream("/tmp/say.txt") << textgreeting;
     system("espeak-ng -v en -f /tmp/say.txt");
 
-    cout << "Please choose your language" << colors["YELLOW"] << "(EN,RU,DE)" << colors["RESET"] << endl;
+    //cout << "Please choose your language" << colors["YELLOW"] << "(EN,RU,DE)" << colors["RESET"] << endl;
 
     cout << "Which art of LLM do you use? (" << colors["YELLOW"] << "ollama" << colors["RESET"] << " for Ollama server, " << colors["YELLOW"] << "openai" << colors["RESET"] << " for Deepseek/ChatGPT/Claude and others)" << endl;
     cin >> first_time_settings["llm_type"];
@@ -273,7 +273,7 @@ void handleInput()
                  << colors["YELLOW"] << "/setup" << colors["RESET"] << " - run setup again\n"
                  << colors["YELLOW"] << "/reset" << colors["RESET"] << " - reset local settings and run setup again\n"
                  << colors["YELLOW"] << "/update" << colors["RESET"] << " - update the program from the release\n"
-                 << colors["YELLOW"] << "/update-from-repo" << colors["RESET"] << " - update from the last commit\n"
+                 << colors["YELLOW"] << "/update-from-repo" << colors["RESET"] << " - update from the last commit (I don't recommend this for non developer\n"
                  << colors["YELLOW"] << "/allow" << colors["RESET"] << " - allow executing commands without asking\n"
                  << colors["YELLOW"] << "/disallow" << colors["RESET"] << " - disallow executing commands without asking\n"
                  << colors["YELLOW"] << "/help" << colors["RESET"] << " - show this help message" << colors["RESET"] << endl;
