@@ -109,7 +109,8 @@ void myexit()
 }
 
 void reset()
-{
+{   
+    uinput = "";
     cout << colors["RED"] << "DO YOU REALLY WANT TO DELTE ALL YOUR PERSONAL SETTINGS?" << colors["YELLOW"] << " (y/n) " << colors["RESET"] << endl;
     string tmp;
     cin >> tmp;
@@ -140,7 +141,8 @@ void checkfirst_time()
 }
 
 void setup()
-{
+{   
+    uinput = "";
     map<string, string> first_time_settings;
 
     textgreeting = "Hi, I am BIT, nice to meet you here! Please fill the settings and we can start! ";
@@ -261,7 +263,7 @@ void handleInput()
             // uinput = "executing commands without asking is not allowed now, please ask the user for allowing it, explain why you need it";
         }
         if (uinput == "/update-from-repo")
-        {
+        {   uinput = "";
             system("chmod +x update-from-repo.sh");
             system("./update-from-repo.sh");
             myexit();
