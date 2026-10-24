@@ -7,10 +7,15 @@ using json = nlohmann::json;
 
 string uinput;
 string uianswer;
+string piper_command ="";
 
 bool recording = false;
 bool is_thinking = false;
 bool textgreeting2_enabled = false;
+bool autohealing = false;
+bool first_time;
+bool allowcommand = false;
+
 
 string greeting = R"(
 ██████╗ ██╗████████╗
@@ -64,9 +69,7 @@ FILE *rec = nullptr;
 
 map<string, string> settings;
 
-bool autohealing = false;
-bool first_time;
-bool allowcommand = false;
+
 
 // bool updateAvailable() {
 //     httplib::Client cli("https://raw.githubusercontent.com");
@@ -82,13 +85,14 @@ bool allowcommand = false;
 
 void update()
 {
-    myexit();
+    
     cout << "Start updating." << endl;
-    system("chmod +x update.sh");
+    system("sudo chmod +x update.sh");
     cout << ".";
     system("clear");
     cout << "Updating..." << endl;
     system("./update.sh");
+    myexit();
 }
 
 void myexit()
@@ -155,7 +159,16 @@ void setup()
     ofstream("/tmp/say.txt") << textgreeting;
     system("espeak-ng -v en -f /tmp/say.txt");
 
-    //cout << "Please choose your language" << colors["YELLOW"] << "(EN,RU,DE)" << colors["RESET"] << endl;
+    cout << "Please choose your language" << colors["YELLOW"] << "(EN,RU,DE)" << colors["RESET"] << endl;
+    cin >> first_time_settings["language"];
+    if(first_time_settings["language"] == "RU") {
+        setup_RU();
+        return;
+    }
+    if(first_time_settings["language"] == "DE") {
+        setup_DE(); 
+        return;
+    }
 
     cout << "Which art of LLM do you use? (" << colors["YELLOW"] << "ollama" << colors["RESET"] << " for Ollama server, " << colors["YELLOW"] << "openai" << colors["RESET"] << " for Deepseek/ChatGPT/Claude and others)" << endl;
     cin >> first_time_settings["llm_type"];
@@ -208,12 +221,28 @@ void setup()
     file << "*please also don't change the values after hashtags.\n";
     file << "*comments are marked with * at the beginning of the line, you can add there whatever you want\n\n";
 
+
+    
+    file << "#piper_model_path_ru \n ./piper/ru_RU-ruslan-medium.onnx \n\n";
+    file << "#piper_model_path_de \n ./piper/de_DE-thorsten-medium.onnx \n\n";
+    file << "#piper_model_path_en \n ./piper/en_US-lessac-medium.onnx \n\n";
+    
     for (auto &[key, value] : first_time_settings)
     {
         file << "#" << key << "\n"
              << value << "\n\n";
     }
+    if(first_time_settings["language"]== "RU")
+    file << "#piper_model \n " << first_time_settings["piper_model_path_ru"] << "\n\n";
+
+    if(first_time_settings["language"]== "DE")
+    file << "#piper_model \n " << first_time_settings["piper_model_path_de"] << "\n\n";
+
+    if(first_time_settings["language"]== "EN")
+    file << "#piper_model \n " << first_time_settings["piper_model_path_en"] << "\n\n";
     first_time = false;
+
+    
 }
 
 void startRec()
@@ -231,13 +260,23 @@ void stopRec()
     }
 }
 
+void say(string soutput){
+
+    if (piper_command.empty()) return; 
+
+    ofstream("/tmp/say.txt") << soutput;
+    system(piper_command.c_str());
+    
+    
+}
+
 void handleInput()
 {
     while (getline(cin, uinput))
     {
 
-        // cout << uinput<< endl;
-
+       
+ 
         if (uinput == "/exit")
             myexit();
         if (uinput == "/setup")
@@ -578,8 +617,7 @@ void readSettings()
 
         return;
     }
-    while (getline(file, line))
-    {
+    while (getline(file, line)){
         if (line.empty() || line[0] == '*')
             continue; // skip empty lines
         if (line[0] == '#')
@@ -589,4 +627,5 @@ void readSettings()
         }
         settings[key] = line;
     }
+    piper_command = "./piper/piper -m " + settings["piper_model"] + " -f /tmp/answer.wav < /tmp/say.txt 2>/dev/null && aplay -q /tmp/answer.wav 2>/dev/null && rm /tmp/answer.wav";
 }

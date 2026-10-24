@@ -40,11 +40,14 @@ extern bool allowcommand;
 extern bool is_thinking;
 extern map <string, string> colors;
 extern bool textgreeting2_enabled;
+extern string piper_command;
 
 
 void reset();
 void checkfirst_time();
 void setup();
+void setup_RU();
+void setup_DE();
 void myexit();
 void update();
 
@@ -52,6 +55,7 @@ void handleInput();
 bool checkUserInput();
 void startRec();
 void stopRec();
+void say(string soutnput);
 
 string readSysPrompt(const string& syspromptfile);
 void readSettings();
@@ -62,3 +66,13 @@ string getCmd();
 
 string runTool(const string& name, const json& args);
 string executeCommand(const string& cmd);
+
+/*
+твоя_папка_с_проектом/
+├── ollamatest
+├── settings.txt
+└── piper/                         <-- Папка с Piper
+    ├── piper                      <-- Программа
+    ├── ru_RU-ruslan-medium.onnx   <-- Сама модель (ЭТО НУЖНО УКАЗАТЬ)
+    └── ru_RU-ruslan-medium.onnx.json\
+    */
