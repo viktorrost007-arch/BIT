@@ -59,7 +59,7 @@ string sysprompt = readSysPrompt(syspromptfile);
 string filepath = "test.wav";
 
 int counter;
-
+    //
 FILE *rec = nullptr;
 
 map<string, string> settings;
