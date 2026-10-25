@@ -432,6 +432,8 @@ bool SendToOllama()
     string path = isOllama ? "/api/chat" : "/v1/chat/completions";
     string model = isOllama ? settings["ollama_model"] : settings["openai_model"];
 
+    string toolout ="";
+
     json request = {
         {"model", model},
         {"stream", false},
@@ -505,11 +507,12 @@ bool SendToOllama()
                 if (answer != "y" && answer != "Y")
                 {
                     cout << "Command not allowed, skipping..." << endl;
+                    toolout = "This command is not allowed by user, please ask him to accept or first try another solution.";
                     continue;
                 }
             }
 
-            string toolout = runTool(name, args);
+            toolout = runTool(name, args);
             // cout<< name << ">> "<< args;
             history.push_back({{"role", "tool"},
                                {"tool_name", name},
