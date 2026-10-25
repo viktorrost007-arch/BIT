@@ -264,7 +264,7 @@ void stopRec()
 void say(string soutput){
 
     if (piper_command.empty()) return; 
-
+    cout << "DEBUG: " << piper_command << endl; // <-- временн
     ofstream("/tmp/say.txt") << soutput;
     system(piper_command.c_str());
     
@@ -509,7 +509,10 @@ bool SendToOllama()
                 if (answer != "y" && answer != "Y")
                 {
                     cout << "Command not allowed, skipping..." << endl;
-                    toolout = "This command is not allowed by user, please ask him to accept or first try another solution.";
+                    toolout = "This command is not allowed by user, please ask him to accept or first try another solution and give feedback.";
+                    history.push_back({ {"role", "tool"},
+                                        {"tool_name", name},
+                                        {"content", toolout}});
                     continue;
                 }
             }
