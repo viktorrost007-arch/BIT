@@ -17,16 +17,18 @@ int main() {
     textgreeting2_enabled = false;
   }
   readSettings();
-  //cout << greeting2 << endl; 
+  
   
   textgreeting = settings["greeting"];
   
 
   history.push_back({ {"role","system"}, {"content", sysprompt} });
+  
   ofstream("/tmp/say.txt") << textgreeting;
     system("espeak-ng -v en -f /tmp/say.txt");
-  // std::string command = "espeak-ng -v en \"" + textgreeting+ "\"";
-  // std::system(command.c_str());
+  
+//say(textgreeting);
+
 
   cout<< "What do you wanna ask?"<< endl;
 
