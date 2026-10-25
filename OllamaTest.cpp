@@ -24,15 +24,16 @@ int main() {
 
   history.push_back({ {"role","system"}, {"content", sysprompt} });
   
-  ofstream("/tmp/say.txt") << textgreeting;
-    system("espeak-ng -v en -f /tmp/say.txt");
+  // ofstream("/tmp/say.txt") << textgreeting;
+  //   system("espeak-ng -v en -f /tmp/say.txt");
   
-//say(textgreeting);
+  say(textgreeting);
 
 
   cout<< "What do you wanna ask?"<< endl;
 
   handleInput();
+  
 myexit();
   
   

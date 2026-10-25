@@ -11,8 +11,8 @@ void setup_RU() {
     cout << "Ты можешь изменить их в любое время в файле settings.txt" << endl;
     cout << "Пожалуйста, напиши свой системный промпт в файле prompt.txt" << endl << endl;
 
-    ofstream("/tmp/say.txt") << textgreeting;
-    system("espeak-ng -v ru -f /tmp/say.txt");
+    // ofstream("/tmp/say.txt") << textgreeting;
+    // system("espeak-ng -v ru -f /tmp/say.txt");
 
     cout << "Какой тип LLM ты используешь? (" << colors["YELLOW"] << "ollama" << colors["RESET"] << " для сервера Ollama, " << colors["YELLOW"] << "openai" << colors["RESET"] << " для Deepseek/ChatGPT/Claude и других)" << endl;
     cin >> first_time_settings["llm_type"];
@@ -56,7 +56,7 @@ void setup_RU() {
     file << "*пожалуйста, также не меняйте значения после решеток.\n";
     file << "*комментарии помечены * в начале строки, вы можете добавить туда все, что захотите\n\n";
 
-   file << "#piper_model_path_ru \n ./piper/ru_RU-ruslan-medium.onnx \n\n";
+    file << "#piper_model_path_ru \n ./piper/ru_RU-ruslan-medium.onnx \n\n";
     file << "#piper_model_path_de \n ./piper/de_DE-thorsten-medium.onnx \n\n";
     file << "#piper_model_path_en \n ./piper/en_US-lessac-medium.onnx \n\n";
     
@@ -68,11 +68,11 @@ void setup_RU() {
     if(first_time_settings["language"]== "RU")
     file << "#piper_model \n " << first_time_settings["piper_model_path_ru"] << "\n\n";
 
-    if(first_time_settings["language"]== "DE")
-    file << "#piper_model \n " << first_time_settings["piper_model_path_de"] << "\n\n";
+    // if(first_time_settings["language"]== "DE")
+    // file << "#piper_model \n " << first_time_settings["piper_model_path_de"] << "\n\n";
 
-    if(first_time_settings["language"]== "EN")
-    file << "#piper_model \n " << first_time_settings["piper_model_path_en"] << "\n\n";
+    // if(first_time_settings["language"]== "EN")
+    // file << "#piper_model \n " << first_time_settings["piper_model_path_en"] << "\n\n";
     first_time = false;
 }
 
@@ -89,8 +89,8 @@ void setup_DE() {
     cout << "Du kannst sie jederzeit in der settings.txt ändern" << endl;
     cout << "Bitte schreibe deinen System-Prompt in die prompt.txt" << endl << endl;
 
-    ofstream("/tmp/say.txt") << textgreeting;
-    system("espeak-ng -v de -f /tmp/say.txt");
+    // ofstream("/tmp/say.txt") << textgreeting;
+    // system("espeak-ng -v de -f /tmp/say.txt");
 
     cout << "Welche Art von LLM benutzt du? (" << colors["YELLOW"] << "ollama" << colors["RESET"] << " für Ollama-Server, " << colors["YELLOW"] << "openai" << colors["RESET"] << " für Deepseek/ChatGPT/Claude und andere)" << endl;
     cin >> first_time_settings["llm_type"];
@@ -145,14 +145,14 @@ void setup_DE() {
         file << "#" << key << "\n"
              << value << "\n\n";
     }
-    if(first_time_settings["language"]== "RU")
-    file << "#piper_model \n " << first_time_settings["piper_model_path_ru"] << "\n\n";
+    // if(first_time_settings["language"]== "RU")
+    // file << "#piper_model \n " << first_time_settings["piper_model_path_ru"] << "\n\n";
 
     if(first_time_settings["language"]== "DE")
     file << "#piper_model \n " << first_time_settings["piper_model_path_de"] << "\n\n";
 
-    if(first_time_settings["language"]== "EN")
-    file << "#piper_model \n " << first_time_settings["piper_model_path_en"] << "\n\n";
+    // if(first_time_settings["language"]== "EN")
+    // file << "#piper_model \n " << first_time_settings["piper_model_path_en"] << "\n\n";
    
     first_time = false;
 }
