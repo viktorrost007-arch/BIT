@@ -93,6 +93,7 @@ void update()
     cout << "Updating..." << endl;
     system("./update.sh");
     myexit();
+    return;
 }
 
 void myexit()
@@ -106,8 +107,8 @@ void myexit()
     remove("log.txt");
     cout << "Done." << endl;
     cout << "Goodbye!" << endl;
-    system("espeak-ng -v en \"Meet you later!\"");
-
+    // system("espeak-ng -v en \"Meet you later!\"");
+     say("Meet you later");
     system("clear");
     std::exit(0);
 }
@@ -128,6 +129,7 @@ void reset()
         remove("prompt.txt");
         cout << "." << endl;
         setup();
+        return;
     }
     else
     {
@@ -223,9 +225,9 @@ void setup()
 
 
     
-    file << "#piper_model_path_ru \n ./piper/ru_RU-ruslan-medium.onnx \n\n";
-    file << "#piper_model_path_de \n ./piper/de_DE-thorsten-medium.onnx \n\n";
-    file << "#piper_model_path_en \n ./piper/en_US-lessac-medium.onnx \n\n";
+    file << "#piper_model_path_ru\n./piper/ru_RU-ruslan-medium.onnx\n\n";
+    file << "#piper_model_path_de\n./piper/de_DE-thorsten-medium.onnx\n\n";
+    file << "#piper_model_path_en\n./piper/en_US-lessac-medium.onnx\n\n";
     
     for (auto &[key, value] : first_time_settings)
     {
@@ -260,12 +262,19 @@ void stopRec()
         rec = nullptr;
     }
 }
+string getSay(const string& input) {
+    size_t a = input.find("<say>");
+    size_t b = input.find("</say>");
+    if (a == string::npos || b == string::npos) return input;
+    return input.substr(a + 5, b - a - 5);
 
-void say(string soutput){
+ }
 
+void say(const string& soutput){
+    string text_to_say = getSay(soutput);
     if (piper_command.empty()) return; 
-    cout << "DEBUG: " << piper_command << endl; // <-- временн
-    ofstream("/tmp/say.txt") << soutput;
+    //cout << "DEBUG: " << piper_command << endl; // <-- временн
+    ofstream("/tmp/say.txt") << text_to_say;
     system(piper_command.c_str());
     
     
@@ -307,6 +316,7 @@ void handleInput()
             system("chmod +x update-from-repo.sh");
             system("./update-from-repo.sh");
             myexit();
+            continue;
         }
         if (uinput == "/help")
         {
@@ -421,11 +431,74 @@ string readSysPrompt(const string &syspromptfile)
     return buffer.str();
 }
 
+
+
+
+
+
+
+
+
+
+//Created using an LLM
+
+void trimHistory() {
+    const int MAX_MESSAGES = 15; // Максимум сообщений (без учета системного)
+
+    // Пока история больше лимита (учитывая, что history[0] - это system)
+    while (history.size() > MAX_MESSAGES + 1) {
+        // Нам нужно найти первое сообщение с ролью "user" после system
+        // и удалить его вместе со всеми ответами ассистента и вызовами инструментов, 
+        // которые идут ДО следующего "user".
+        
+        int user_index = -1;
+        for (size_t i = 1; i < history.size(); i++) {
+            if (history[i]["role"] == "user") {
+                user_index = i;
+                break;
+            }
+        }
+
+        // Если нашли user (а он должен быть), удаляем его и всё, что идет за ним, 
+        // до следующего user
+        if (user_index != -1) {
+            int next_user_index = -1;
+            for (size_t i = user_index + 1; i < history.size(); i++) {
+                if (history[i]["role"] == "user") {
+                    next_user_index = i;
+                    break;
+                }
+            }
+
+            // Если следующий user найден, удаляем блок от текущего user до следующего user
+            if (next_user_index != -1) {
+                history.erase(history.begin() + user_index, history.begin() + next_user_index);
+            } else {
+                // Если следующего user нет (мы в конце диалога), 
+                // оставляем последний блок, чтобы не убить текущий контекст
+                break; 
+            }
+        } else {
+            break; // Если user'ов нет, что-то пошло не так, выходим
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
 ////send function
 
 bool SendToOllama()
 {
-
+    trimHistory();
     // считываем параметры моделей (условие да: нет
 
     bool isOllama = (settings["llm_type"] == "ollama");
@@ -476,16 +549,24 @@ bool SendToOllama()
         return false;
     }
 
-    json msg; // парсим ответ в зависимости от типа LLM (Ollama или OpenAI)
-    if (isOllama)
-    {
-        msg = json::parse(res->body)["message"];
-    }
-    else
-    {
-        msg = json::parse(res->body)["choices"][0]["message"];
-    }
 
+
+    json msg;
+   
+
+    try {
+        if (isOllama){ // парсим ответ в зависимости от типа LLM (Ollama или OpenAI)
+        msg = json::parse(res->body)["message"];
+        } else {
+        msg = json::parse(res->body)["choices"][0]["message"];
+        }
+    } catch (const std::exception& e) {
+        // Если парсинг упал (например, пришел HTML), выводим ошибку
+        cerr << colors["RED"] << "JSON Parse Error: " << e.what() << "\n" << colors["RESET"];
+        return false;
+    }
+    
+    
     history.push_back(msg);
 
     if (msg.contains("tool_calls") && !msg["tool_calls"].empty())
@@ -561,13 +642,7 @@ string SendToWhisper()
     return json::parse(out).value("text", "");
 }
 
-// string getCmd() {
-//     size_t a = uianswer.find("<cmd>");
-//     size_t b = uianswer.find("</cmd>");
-//     if (a == string::npos || b == string::npos) return "";
-//     return uianswer.substr(a + 5, b - a - 5);
-//
-// }
+
 
 string runTool(const string &name, const json &args)
 {

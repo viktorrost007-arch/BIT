@@ -5,6 +5,8 @@ void setup_RU() {
     uinput = "";
     map<string, string> first_time_settings;
 
+    first_time_settings["language"] = "RU";
+
     textgreeting = "Привет, я BIT, рад познакомиться! Пожалуйста, заполни настройки, и мы начнем! ";
 
     cout << colors["GREEN"] << "Привет, я BIT, рад познакомиться! Пожалуйста, заполни настройки, и мы начнем! " << colors["RESET"] << endl;
@@ -56,9 +58,9 @@ void setup_RU() {
     file << "*пожалуйста, также не меняйте значения после решеток.\n";
     file << "*комментарии помечены * в начале строки, вы можете добавить туда все, что захотите\n\n";
 
-    file << "#piper_model_path_ru \n ./piper/ru_RU-ruslan-medium.onnx \n\n";
-    file << "#piper_model_path_de \n ./piper/de_DE-thorsten-medium.onnx \n\n";
-    file << "#piper_model_path_en \n ./piper/en_US-lessac-medium.onnx \n\n";
+    file << "#piper_model_path_ru\n./piper/ru_RU-ruslan-medium.onnx\n\n";
+    file << "#piper_model_path_de\n./piper/de_DE-thorsten-medium.onnx\n\n";
+    file << "#piper_model_path_en\n./piper/en_US-lessac-medium.onnx\n\n";
     
     for (auto &[key, value] : first_time_settings)
     {
@@ -82,7 +84,7 @@ void setup_RU() {
 void setup_DE() {   
     uinput = "";
     map<string, string> first_time_settings;
-
+    first_time_settings["language"] = "DE";
     textgreeting = "Hallo, ich bin BIT, schön dich hier zu treffen! Bitte fülle die Einstellungen aus, dann können wir starten! ";
 
     cout << colors["GREEN"] << "Hallo, ich bin BIT, schön dich hier zu treffen! Bitte fülle die Einstellungen aus, dann können wir starten! " << colors["RESET"] << endl;
@@ -135,9 +137,9 @@ void setup_DE() {
     file << "*kommentare sind mit * am Anfang der Zeile markiert, du kannst dort alles hinzufügen, was du möchtest\n\n";
 
 
-    file << "#piper_model_path_ru \n ./piper/ru_RU-ruslan-medium.onnx \n\n";
-    file << "#piper_model_path_de \n ./piper/de_DE-thorsten-medium.onnx \n\n";
-    file << "#piper_model_path_en \n ./piper/en_US-lessac-medium.onnx \n\n";
+    file << "#piper_model_path_ru\n./piper/ru_RU-ruslan-medium.onnx\n\n";
+    file << "#piper_model_path_de\n./piper/de_DE-thorsten-medium.onnx\n\n";
+    file << "#piper_model_path_en\n./piper/en_US-lessac-medium.onnx\n\n";
      
     
     for (auto &[key, value] : first_time_settings)

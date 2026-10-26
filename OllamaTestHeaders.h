@@ -55,12 +55,13 @@ void handleInput();
 bool checkUserInput();
 void startRec();
 void stopRec();
-void say(string soutnput);
+void say(const string& soutnput);
 
 string readSysPrompt(const string& syspromptfile);
 void readSettings();
 
 bool SendToOllama();
+void trimHistory();
 string SendToWhisper();
 string getCmd();
 
