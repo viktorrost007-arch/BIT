@@ -65,8 +65,8 @@ void setup_RU() {
         file << "#" << key << "\n"
              << value << "\n\n";
     }
-    if(first_time_settings["language"]== "RU")
-    file << "#piper_model \n " << first_time_settings["piper_model_path_ru"] << "\n\n";
+    // if(first_time_settings["language"]== "RU")
+    // file << "#piper_model \n " << first_time_settings["piper_model_path_ru"] << "\n\n";
 
     // if(first_time_settings["language"]== "DE")
     // file << "#piper_model \n " << first_time_settings["piper_model_path_de"] << "\n\n";
@@ -148,8 +148,8 @@ void setup_DE() {
     // if(first_time_settings["language"]== "RU")
     // file << "#piper_model \n " << first_time_settings["piper_model_path_ru"] << "\n\n";
 
-    if(first_time_settings["language"]== "DE")
-    file << "#piper_model \n " << first_time_settings["piper_model_path_de"] << "\n\n";
+    // if(first_time_settings["language"]== "DE")
+    // file << "#piper_model \n " << first_time_settings["piper_model_path_de"] << "\n\n";
 
     // if(first_time_settings["language"]== "EN")
     // file << "#piper_model \n " << first_time_settings["piper_model_path_en"] << "\n\n";

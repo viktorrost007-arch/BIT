@@ -238,8 +238,8 @@ void setup()
     // if(first_time_settings["language"]== "DE")
     // file << "#piper_model \n " << first_time_settings["piper_model_path_de"] << "\n\n";
 
-    if(first_time_settings["language"]== "EN")
-    file << "#piper_model \n " << first_time_settings["piper_model_path_en"] << "\n\n";
+    // if(first_time_settings["language"]== "EN")
+    // file << "#piper_model \n " << first_time_settings["piper_model_path_en"] << "\n\n";
     
     first_time = false;
 
@@ -635,5 +635,14 @@ void readSettings()
         }
         settings[key] = line;
     }
-    piper_command = "./piper/piper -m " + settings["piper_model"] + " -f /tmp/answer.wav < /tmp/say.txt 2>/dev/null && aplay -q /tmp/answer.wav 2>/dev/null && rm /tmp/answer.wav";
+    if (settings["language"] == "RU"){
+          piper_command = "./piper/piper -m " + settings["piper_model_path_ru"] + " -f /tmp/answer.wav < /tmp/say.txt 2>/dev/null && aplay -q /tmp/answer.wav 2>/dev/null && rm /tmp/answer.wav";
+    }
+    if (settings["language"] == "DE"){
+          piper_command = "./piper/piper -m " + settings["piper_model_path_de"] + " -f /tmp/answer.wav < /tmp/say.txt 2>/dev/null && aplay -q /tmp/answer.wav 2>/dev/null && rm /tmp/answer.wav";
+    }
+
+   if (settings["language"] == "EN"){
+          piper_command = "./piper/piper -m " + settings["piper_model_path_en"] + " -f /tmp/answer.wav < /tmp/say.txt 2>/dev/null && aplay -q /tmp/answer.wav 2>/dev/null && rm /tmp/answer.wav";
+    }
 }
