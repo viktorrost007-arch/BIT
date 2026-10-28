@@ -104,7 +104,7 @@ void myexit()
     cout << ".";
     remove("/tmp/say.txt");
     cout << "." << endl;
-    remove("log.txt");
+    //remove("log.txt");
     cout << "Done." << endl;
     cout << "Goodbye!" << endl;
     // system("espeak-ng -v en \"Meet you later!\"");
@@ -127,6 +127,7 @@ void reset()
         remove("settings.txt");
         cout << ".";
         remove("prompt.txt");
+        remove("log.txt");
         cout << "." << endl;
         setup();
         return;
@@ -136,15 +137,67 @@ void reset()
         cout << "Reset canceled." << endl;
     }
 }
+
+
 void checkfirst_time()
 {
     ifstream file("settings.txt");
-    if (!file.is_open())
-    {
+    if (!file.is_open()){
         first_time = true;
         setup();
     }
 }
+
+
+//писать было немного лень вручную. нейронке пример показал и она дописала (просто в 3 часа ночи голова занята не этим)
+
+void checkProperties() {
+    cout << colors["YELLOW"] << "Checking system properties..." << colors["RESET"] << endl;
+    bool critical_error = false;
+
+    // 1. Проверка утилит (используем command -v, он надежнее which)
+    if (system("command -v curl >/dev/null 2>&1") != 0) {
+        cerr << colors["RED"] << "[-] curl is missing. API requests will fail. (sudo apt install curl)" << colors["RESET"] << endl;
+        critical_error = true;
+    }
+    if (system("command -v arecord >/dev/null 2>&1") != 0) {
+        cerr << colors["RED"] << "[-] arecord is missing. Voice input disabled. (sudo apt install alsa-utils)" << colors["RESET"] << endl;
+    }
+    if (system("command -v aplay >/dev/null 2>&1") != 0) {
+        cerr << colors["RED"] << "[-] aplay is missing. Audio playback disabled. (sudo apt install alsa-utils)" << colors["RESET"] << endl;
+    }
+
+    // 2. Проверка Piper (локальный)
+    ifstream piper_check("./piper/piper");
+    if (!piper_check.is_open()) {
+        cout << colors["YELLOW"] << "[!] Piper TTS not found in ./piper/. Will use espeak-ng instead." << colors["RESET"] << endl;
+        if (system("command -v espeak-ng >/dev/null 2>&1") != 0) {
+            cerr << colors["RED"] << "[-] espeak-ng is missing too. BIT will be silent!" << colors["RESET"] << endl;
+        }
+    }
+
+    // 3. Проверка критических файлов
+    ifstream file1("tools.json");
+    if (!file1.is_open()) {
+        cerr << colors["RED"] << "[-] CRITICAL: tools.json is missing! BIT cannot run without it." << colors["RESET"] << endl;
+        critical_error = true;
+    }
+
+    ifstream file2("prompt.txt");
+    if (!file2.is_open()) {
+        cout << colors["YELLOW"] << "[!] prompt.txt is missing. BIT will work without a system prompt." << colors["RESET"] << endl;
+    }
+
+    // Если не хватает критических файлов — выходим
+    if (critical_error) {
+        cout << colors["RED"] << "Please restore the missing files or download them from GitHub." << colors["RESET"] << endl;
+        exit(1);
+    }
+}
+
+
+
+
 
 void setup()
 {   
@@ -271,14 +324,19 @@ string getSay(const string& input) {
  }
 
 void say(const string& soutput){
+
+    if(sound_enabled){
+
     string text_to_say = getSay(soutput);
     if (piper_command.empty()) return; 
     //cout << "DEBUG: " << piper_command << endl; // <-- временн
     ofstream("/tmp/say.txt") << text_to_say;
     system(piper_command.c_str());
-    
+    } 
     
 }
+
+
 
 void handleInput()
 {
@@ -289,8 +347,10 @@ void handleInput()
  
         if (uinput == "/exit")
             myexit();
-        if (uinput == "/setup")
+        if (uinput == "/setup"){
             setup();
+            readSettings();
+        }
         if (uinput == "/reset")
             reset();
         if (uinput == "/update")
@@ -569,11 +629,13 @@ bool SendToOllama()
     
     history.push_back(msg);
 
-    if (msg.contains("tool_calls") && !msg["tool_calls"].empty())
-    {
+    if (msg.contains("tool_calls") && !msg["tool_calls"].empty()){
+
+       
 
         for (auto &call : msg["tool_calls"])
         {
+            string call_id = call["id"];
             string name = call["function"]["name"];
             json args = call["function"]["arguments"];
             args = args.is_string() ? json::parse(args.get<string>()) : args;
@@ -593,7 +655,11 @@ bool SendToOllama()
                     toolout = "This command is not allowed by user, please ask him to accept or first try another solution and give feedback.";
                     history.push_back({ {"role", "tool"},
                                         {"tool_name", name},
-                                        {"content", toolout}});
+                                        {"tool_call_id", call_id},
+                                        {"content", toolout + "\n\n[SYSTEM REMINDER: You MUST wrap your verbal response to the user in <say>...</say> tags. DO NOT read the command output aloud!]"}
+                                    });
+
+
                     continue;
                 }
             }
@@ -602,7 +668,8 @@ bool SendToOllama()
             // cout<< name << ">> "<< args;
             history.push_back({{"role", "tool"},
                                {"tool_name", name},
-                               {"content", toolout}});
+                               {"tool_call_id", call_id},
+                               {"content", toolout + "\n\n[SYSTEM REMINDER: You MUST wrap your verbal response to the user in <say>...</say> tags. DO NOT read the command output aloud!]"}});
             cout << "> TOOL" << " " << name << endl;
             cout << "> " << args << endl;
 
@@ -638,40 +705,22 @@ string SendToWhisper()
     while (fgets(buf, sizeof(buf), p))
         out += buf;
     pclose(p);
-
+    try{
     return json::parse(out).value("text", "");
-}
-
-
-
-string runTool(const string &name, const json &args)
-{
-    if (name == "run_shell")
-        return executeCommand(args["command"]);
-    return "unknown tool: " + name;
-}
-
-string executeCommand(const string &cmd)
-{
-    FILE *p = popen((cmd + " 2>&1").c_str(), "r");
-    if (!p)
-        return "[popen failed]";
-
-    string out;
-    char buf[4096];
-    size_t n;
-    while ((n = fread(buf, 1, sizeof(buf), p)) > 0)
-    {
-        out.append(buf, n);
     }
-    pclose(p);
+    catch(const std::exception& e) {
+       
+        cerr << colors["RED"] << "JSON Parse Error: " << e.what() << "\n" << colors["RESET"];
+        cout << "please restart the application";
+        
+    }
 
-    if (out.empty())
-        out = "[no output]";
-    if (out.size() > 4000)
-        out = out.substr(0, 4000) + "\n...(truncated)";
-    return out;
-}
+    }
+
+
+
+
+
 
 void readSettings()
 {

@@ -21,6 +21,7 @@ extern const string VERSION;
 
 
 extern map <string,string> settings;
+extern bool sound_enabled;
 extern bool recording;            // ← тут
 extern string greeting;      // ← тут
 extern string textgreeting;  // ← тут
@@ -45,6 +46,7 @@ extern string piper_command;
 
 void reset();
 void checkfirst_time();
+void checkProperties();
 void setup();
 void setup_RU();
 void setup_DE();
