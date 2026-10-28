@@ -9,6 +9,7 @@ string uinput;
 string uianswer;
 string piper_command ="";
 
+bool sound_enabled = true;
 bool recording = false;
 bool is_thinking = false;
 bool textgreeting2_enabled = false;
@@ -36,6 +37,7 @@ string greeting2 =
     "* UPDATE FROM LAST COMMIT WITH \033[33m/update-from-repo\033[0m . THIS WILL RUN update-from-repo.sh . This version is not production ready, I dont recommend to do this.\n"
     "* ALLOW EXECUTING COMMANDS WITHOUT ASKING WITH \033[33m/allow\033[0m, DISALLOW WITH \033[33m/disallow\033[0m.\n"
     "* PRESS ENTER TO START RECORDING, PRESS ENTER AGAIN TO STOP RECORDING AND SEND AUDIO TO BIT.\n"
+    "* FOR TOGGLE THE SOUND PLEASE USE \033[33m/sound-on OR sound-of\033[0m COMMAND.\n"
     "* FOR HELP PLEASE USE \033[33m/help\033[0m COMMAND.\n";
 
 string greeting3 = "* FOR HELP PLEASE USE \033[33m/help\033[0m COMMAND.\n";
@@ -388,7 +390,19 @@ void handleInput()
                  << colors["YELLOW"] << "/update-from-repo" << colors["RESET"] << " - update from the last commit (I don't recommend this for non developer\n"
                  << colors["YELLOW"] << "/allow" << colors["RESET"] << " - allow executing commands without asking\n"
                  << colors["YELLOW"] << "/disallow" << colors["RESET"] << " - disallow executing commands without asking\n"
-                 << colors["YELLOW"] << "/help" << colors["RESET"] << " - show this help message" << colors["RESET"] << endl;
+                 << colors["YELLOW"] << "/help" << colors["RESET"] << " - show this help message\n" << colors["RESET"] << endl;
+            cout << colors["YELLOW"] << "/sound-on (/sound-off)" << colors["RESET"] << " - toggle sound" << colors["RESET"] << endl;
+            uinput = "";
+            continue;
+        }
+        if (uinput == "/sound-on"){
+            sound_enabled = true;
+            uinput = "";
+            continue;
+        }
+
+         if (uinput == "/sound-off"){
+            sound_enabled = false;
             uinput = "";
             continue;
         }
