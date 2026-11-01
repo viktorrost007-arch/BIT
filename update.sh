@@ -1,90 +1,98 @@
-# #!/bin/bash
+
 
 # #Искренне извиняюсь но такого опыта написания скриптов как у нейронки у меня нет поэтому дал ей тезисы что должно быть а потом лапками правил и добавлял по подобию
 
-# # Приветствие
-# read -p "Вы уверены, что хотите обновить BIT? (y/n): " CONFIRM
-# if [[ "$CONFIRM" != "y" && "$CONFIRM" != "Y" ]]; then
-#     echo "Обновление отменено."
-#     exit 0
-# fi
+#!/bin/bash
+set -e
 
-# cd "$(dirname "$0")"
-# REPO="viktorrost007-arch/BIT"
+REPO="viktorrost007-arch/BIT"
+echo "=== BIT AUTO-UPDATER ==="
 
-# echo "Узнаю последнюю версию..."
-# TAG=$(curl -fsSL "https://api.github.com/repos/$REPO/releases/latest" | grep '"tag_name"' | head -1 | sed -E 's/.*"([^"]+)".*/\1/')
+# 1. Проверка базовых зависимостей (на случай, если их нет)
+echo "[1/6] Checking system dependencies..."
+if ! command -v curl &> /dev/null; then
+    sudo apt-get update -y && sudo apt-get install -y curl
+fi
+if ! command -v g++ &> /dev/null; then
+    sudo apt-get update -y && sudo apt-get install -y g++
+fi
 
-# if [ -z "$TAG" ]; then
-#     echo "Не удалось узнать версию (нет релизов или нет сети)."
-#     exit 1
-# fi
+# 2. Получаем информацию о последнем релизе
+echo "[2/6] Fetching latest release info..."
+TAG=$(curl -fsSL "https://api.github.com/repos/$REPO/releases/latest" | grep '"tag_name"' | head -1 | sed -E 's/.*"([^"]+)".*/\1/')
 
-# echo "Последний релиз: $TAG"
-# echo "Качаю исходники..."
+if [ -z "$TAG" ]; then
+    echo "Error: Could not find latest release on GitHub."
+    exit 1
+fi
 
-# B="https://raw.githubusercontent.com/$REPO/$TAG"
+echo "Latest release found: $TAG"
 
-# # Скачиваем всё, включая библиотеки и tools.json
-# curl -fsSL "$B/OllamaTest.cpp"          -o a.cpp          || { echo "сбой"; rm -f a.cpp b.cpp c.h json.hpp httplib.h update.sh.new tools.json; exit 1; }
-# curl -fsSL "$B/OllamaTestFunctions.cpp" -o b.cpp          || { echo "сбой"; rm -f a.cpp b.cpp c.h json.hpp httplib.h update.sh.new tools.json; exit 1; }
-# curl -fsSL "$B/OllamaTestHeaders.h"     -o c.h            || { echo "сбой"; rm -f a.cpp b.cpp c.h json.hpp httplib.h update.sh.new tools.json; exit 1; }
-# curl -fsSL "$B/json.hpp"                -o json.hpp       || { echo "сбой"; rm -f a.cpp b.cpp c.h json.hpp httplib.h update.sh.new tools.json; exit 1; }
-# curl -fsSL "$B/httplib.h"               -o httplib.h      || { echo "сбой"; rm -f a.cpp b.cpp c.h json.hpp httplib.h update.sh.new tools.json; exit 1; }
-# curl -fsSL "$B/tools.json"              -o tools.json     || { echo "сбой"; rm -f a.cpp b.cpp c.h json.hpp httplib.h update.sh.new tools.json; exit 1; }
-# curl -fsSL "$B/version.txt"             -o version.txt    || { echo "сбой"; rm -f a.cpp b.cpp c.h json.hpp httplib.h update.sh.new tools.json; exit 1; }
-# curl -fsSL "$B/README.md"               -o README.md      || { echo "сбой"; rm -f a.cpp b.cpp c.h json.hpp httplib.h update.sh.new tools.json; exit 1; }
+# 3. Скачиваем и распаковываем новый код
+echo "[3/6] Downloading source code for $TAG..."
+curl -fsSL "https://github.com/$REPO/archive/refs/tags/$TAG.tar.gz" -o repo_update.tar.gz
+tar -xzf repo_update.tar.gz
 
-# # Новый скрипт качаем отдельно, чтобы не сломать текущий, пока он выполняется
-# curl -fsSL "$B/update.sh"               -o update.sh.new  || { echo "сбой"; rm -f a.cpp b.cpp c.h json.hpp httplib.h update.sh.new tools.json; exit 1; }
+FOLDER="BIT-${TAG#v}"
 
-# echo "Компилирую..."
-# g++ -std=c++17 -O2 -pthread a.cpp b.cpp -o bit.new
-# if [ $? -ne 0 ]; then
-#     echo "ОШИБКА СБОРКИ! Старая версия оставлена рабочей."
-#     rm -f a.cpp b.cpp c.h json.hpp httplib.h update.sh.new tools.json bit.new
-#     exit 1
-# fi
+# 4. Обновляем файлы (НЕ трогаем settings.txt и prompt.txt)
+echo "[4/6] Updating source files..."
+cp "$FOLDER"/*.cpp .
+cp "$FOLDER"/*.h .
+cp "$FOLDER"/*.json .
 
-# echo "Обновляю файлы..."
-# mv a.cpp OllamaTest.cpp
-# mv b.cpp OllamaTestFunctions.cpp
-# mv c.h   OllamaTestHeaders.h
-# mv update.sh.new update.sh
-# chmod +x update.sh
+# Если у пользователя каким-то чудом нет дефолтных настроек, кладем их
+if [ ! -f "settings.txt" ] && [ -f "$FOLDER/settings.txt" ]; then cp "$FOLDER/settings.txt" .; fi
+if [ ! -f "prompt.txt" ] && [ -f "$FOLDER/prompt.txt" ]; then cp "$FOLDER/prompt.txt" .; fi
 
-# # Бэкап старого бинарника, только если он существует
-# if [ -f ollamatest ]; then
-#     mv ollamatest ollamatest.bak
-# fi
-# mv bit.new ollamatest
-# chmod +x ollamatest
+# Убираем скачанный архив и распакованную папку
+rm -rf "$FOLDER" repo_update.tar.gz
 
-# echo -e "\033[32m Готово, версия $TAG\033[0m"
-# echo "Старая версия сохранена как ollamatest.bak"
-# echo -e "\033[32m Не забывайте заходить на GitHub: в новых версиях могут быть новые файлы. \033[0m"
+# 5. Проверяем Piper (если нет — качаем)
+echo "[5/6] Checking Piper TTS and voice models..."
+mkdir -p piper
+if [ ! -f "piper/piper" ]; then
+    echo "Piper not found. Downloading..."
+    curl -fL -o piper.tar.gz https://github.com/rhasspy/piper/releases/latest/download/piper_linux_x86_64.tar.gz
+    tar -xzf piper.tar.gz
+    rm piper.tar.gz
+    chmod +x piper/piper
+fi
 
-# # --- УСТАНОВКА В СИСТЕМУ ---
-# read -p $'\033[32m Установить/обновить BIT как глобальную команду (bit)? (y/n): \033[0m' INSTALL
-# if [[ "$INSTALL" == "y" || "$INSTALL" == "Y" ]]; then
-#     echo "Для установки требуются права администратора (sudo):"
-#     sudo cp ollamatest /usr/local/bin/bit
-#     sudo chmod +x /usr/local/bin/bit
-#     echo -e "\033[32m Готово! Теперь вы можете запускать BIT из любой папки, просто написав: bit \033[0m"
-# fi
+# Проверяем модели (скачиваем только те, которых нет)
+if [ ! -f "piper/ru.onnx" ]; then
+    curl -fL -o piper/ru.onnx https://huggingface.co/rhasspy/piper-voices/resolve/main/ru/ru_RU/ruslan/medium/ru_RU-ruslan-medium.onnx
+    curl -fL -o piper/ru.onnx.json https://huggingface.co/rhasspy/piper-voices/resolve/main/ru/ru_RU/ruslan/medium/ru_RU-ruslan-medium.onnx.json
+fi
+if [ ! -f "piper/en.onnx" ]; then
+    curl -fL -o piper/en.onnx https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/lessac/medium/en_US-lessac-medium.onnx
+    curl -fL -o piper/en.onnx.json https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/lessac/medium/en_US-lessac-medium.onnx.json
+fi
+if [ ! -f "piper/de.onnx" ]; then
+    curl -fL -o piper/de.onnx https://huggingface.co/rhasspy/piper-voices/resolve/main/de/de_DE/thorsten/medium/de_DE-thorsten-medium.onnx
+    curl -fL -o piper/de.onnx.json https://huggingface.co/rhasspy/piper-voices/resolve/main/de/de_DE/thorsten/medium/de_DE-thorsten-medium.onnx.json
+fi
 
-# # --- ЗАПУСК ---
-# read -p $'\033[32m Запустить новую версию BIT прямо сейчас? (y/n): \033[0m' RUN_NOW
-# if [[ "$RUN_NOW" == "y" || "$RUN_NOW" == "Y" ]]; then
-#     echo "Приятного пользования новой версией!"
-#     clear
-#     # Проверяем, установлена ли глобальная команда, чтобы запустить её
-#     if command -v bit &> /dev/null; then
-#         bit
-#     else
-#         ./ollamatest
-#     fi
-# else
-#     echo "Вы можете запустить новую версию позже, введя ./ollamatest (или bit, если установили)"
-#     exit 0
-# fi
+# 6. Компиляция и замена бинарника
+echo "[6/6] Compiling BIT..."
+# Собираем все .cpp файлы в папке
+g++ -std=c++17 -O2 -pthread *.cpp -o ollamatest.new
+
+# Бэкап старого бинарника и замена
+if [ -f "ollamatest" ]; then
+    mv ollamatest ollamatest.bak
+fi
+mv ollamatest.new ollamatest
+chmod +x ollamatest
+
+echo "========================================="
+echo "   UPDATE COMPLETED SUCCESSFULLY ($TAG)  "
+echo "========================================="
+echo "Your settings and prompt are safe."
+echo "Old binary backed up as ollamatest.bak"
+
+# Спрашиваем, запускать ли новую версию
+read -p "Do you want to start the new version now? (y/n): " RUN_NOW
+if [[ "$RUN_NOW" == "y" || "$RUN_NOW" == "Y" ]]; then
+    ./ollamatest
+fi

@@ -726,6 +726,7 @@ string SendToWhisper()
        
         cerr << colors["RED"] << "JSON Parse Error: " << e.what() << "\n" << colors["RESET"];
         cout << "please restart the application";
+        return "";
         
     }
 
