@@ -9,6 +9,8 @@ string uinput;
 string uianswer;
 string piper_command ="";
 
+bool server_mode = false;
+
 bool sound_enabled = true;
 bool recording = false;
 bool is_thinking = false;
@@ -150,6 +152,11 @@ void checkfirst_time()
     }
 }
 
+void initialise(){
+    if(server_mode){
+        sound_enabled = false;
+    }
+}
 
 //писать было немного лень вручную. нейронке пример показал и она дописала (просто в 3 часа ночи голова занята не этим)
 
@@ -226,6 +233,8 @@ void setup()
         setup_DE(); 
         return;
     }
+
+
 
     cout << "Which art of LLM do you use? (" << colors["YELLOW"] << "ollama" << colors["RESET"] << " for Ollama server, " << colors["YELLOW"] << "openai" << colors["RESET"] << " for Deepseek/ChatGPT/Claude and others)" << endl;
     cin >> first_time_settings["llm_type"];
@@ -416,6 +425,11 @@ void handleInput()
                 cout << "rec...\n";
                 continue; // ← выходим, ничего больше не делаем
             }
+
+
+
+
+
             else
             {
                 stopRec();
@@ -570,12 +584,14 @@ void trimHistory() {
 
 ////send function
 
-bool SendToOllama()
-{
+bool SendToOllama(){
+
     trimHistory();
     // считываем параметры моделей (условие да: нет
 
     bool isOllama = (settings["llm_type"] == "ollama");
+
+    httplib::Result res;
 
     string host = isOllama ? settings["ollama_address"] : settings["openai_address"];
     string path = isOllama ? "/api/chat" : "/v1/chat/completions";
@@ -589,19 +605,28 @@ bool SendToOllama()
         {"tools", tools},
         {"messages", history}};
 
+
+   try{
     httplib::Client cli(host);
     cli.set_read_timeout(60, 0);
-    if (!isOllama)
-        cli.set_bearer_token_auth(settings["llm_key"]);
+    if (!isOllama) cli.set_bearer_token_auth(settings["llm_key"]);
+    
     cout << "Thinking" << endl;
     for (int i = 0; i < 3; i++)
     {
         cout << ".";
         cout.flush();
-        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        std::this_thread::sleep_for(std::chrono::milliseconds(150));
     }
 
-    auto res = cli.Post(path, request.dump(), "application/json");
+    res = cli.Post(path, request.dump(), "application/json");
+   }
+  catch(const std::exception& e){
+    cerr << "Ошибка соединения: " << e.what();
+    return false;
+
+  }
+
     cout << " \r               " << flush;
 
     if (!res)
@@ -649,7 +674,7 @@ bool SendToOllama()
 
         for (auto &call : msg["tool_calls"])
         {
-            string call_id = call["id"];
+            string call_id = call.value("id", "");
             string name = call["function"]["name"];
             json args = call["function"]["arguments"];
             args = args.is_string() ? json::parse(args.get<string>()) : args;
