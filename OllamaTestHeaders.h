@@ -21,7 +21,6 @@ extern const string VERSION;
 
 
 extern map <string,string> settings;
-extern bool server_mode;
 extern bool sound_enabled;
 extern bool recording;            // ← тут
 extern string greeting;      // ← тут

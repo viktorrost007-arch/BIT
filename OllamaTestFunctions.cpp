@@ -9,7 +9,6 @@ string uinput;
 string uianswer;
 string piper_command ="";
 
-bool server_mode = false;
 
 bool sound_enabled = true;
 bool recording = false;
@@ -153,7 +152,7 @@ void checkfirst_time()
 }
 
 void initialise(){
-    if(server_mode){
+    if(settings["server_in_use"]== "true") {
         sound_enabled = false;
     }
 }
@@ -233,7 +232,8 @@ void setup()
         setup_DE(); 
         return;
     }
-
+     cout << "Are you using our server? (" << colors["YELLOW"] << "(true/false)" << colors["RESET"] << endl;
+     cin >> first_time_settings["server_in_use"];
 
 
     cout << "Which art of LLM do you use? (" << colors["YELLOW"] << "ollama" << colors["RESET"] << " for Ollama server, " << colors["YELLOW"] << "openai" << colors["RESET"] << " for Deepseek/ChatGPT/Claude and others)" << endl;
