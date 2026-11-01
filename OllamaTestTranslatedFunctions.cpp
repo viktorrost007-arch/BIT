@@ -15,6 +15,9 @@ void setup_RU() {
 
     // ofstream("/tmp/say.txt") << textgreeting;
     // system("espeak-ng -v ru -f /tmp/say.txt");
+     cout << "Используете наш сервер? (" << colors["YELLOW"] << "(true/false)" << colors["RESET"] << endl;
+     cin >> first_time_settings["server_in_use"];
+
 
     cout << "Какой тип LLM ты используешь? (" << colors["YELLOW"] << "ollama" << colors["RESET"] << " для сервера Ollama, " << colors["YELLOW"] << "openai" << colors["RESET"] << " для Deepseek/ChatGPT/Claude и других)" << endl;
     cin >> first_time_settings["llm_type"];
@@ -93,6 +96,9 @@ void setup_DE() {
 
     // ofstream("/tmp/say.txt") << textgreeting;
     // system("espeak-ng -v de -f /tmp/say.txt");
+
+     cout << "Nutzen Sie unseren Server? (" << colors["YELLOW"] << "(true/false)" << colors["RESET"] << endl;
+     cin >> first_time_settings["server_in_use"];
 
     cout << "Welche Art von LLM benutzt du? (" << colors["YELLOW"] << "ollama" << colors["RESET"] << " für Ollama-Server, " << colors["YELLOW"] << "openai" << colors["RESET"] << " für Deepseek/ChatGPT/Claude und andere)" << endl;
     cin >> first_time_settings["llm_type"];
