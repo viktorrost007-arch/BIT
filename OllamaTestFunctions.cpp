@@ -744,6 +744,10 @@ string SendToWhisper()
     while (fgets(buf, sizeof(buf), p))
         out += buf;
     pclose(p);
+    if (out.empty()) {
+        cerr << colors["RED"] << "Whisper returned empty response. Is the server running?" << colors["RESET"] << endl;
+        return "";
+    }
     try{
     return json::parse(out).value("text", "");
     }
