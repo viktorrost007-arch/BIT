@@ -21,4 +21,4 @@ jobs:
         with:
           context: ./server # Папка, где лежат cpp и Dockerfile
           push: true
-          tags: ghcr.io/viktorrost007-arch/bit-server:latest`
+          tags: ghcr.io/viktorrost007-arch/bit-server:latest
