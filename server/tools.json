@@ -1,0 +1,30 @@
+[
+  {
+    "type": "function",
+    "function": {
+      "name": "run_shell",
+      "description": "Выполнить команду на сервере",
+      "parameters": {
+        "type": "object",
+        "required": ["command"],
+        "properties": {
+          "command": {"type": "string"}
+        }
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "run_shell_on_laptop",
+      "description": "Выполнить команду на ноутбуке пользователя",
+      "parameters": {
+        "type": "object",
+        "required": ["command"],
+        "properties": {
+          "command": {"type": "string"}
+        }
+      }
+    }
+  }
+]

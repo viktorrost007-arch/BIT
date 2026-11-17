@@ -2,6 +2,13 @@
     "files.associations": {
         "fstream": "cpp",
         "iostream": "cpp",
-        "algorithm": "cpp"
+        "algorithm": "cpp",
+        "string": "cpp",
+        "chrono": "cpp",
+        "future": "cpp",
+        "vector": "cpp",
+        "thread": "cpp",
+        "cstdlib": "cpp",
+        "cstdio": "cpp"
     }
 }

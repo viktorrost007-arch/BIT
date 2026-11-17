@@ -20,8 +20,7 @@ string runTool(const string &name, const json &args)
 
 
 
-string executeCommand(const string &cmd)
-{
+string executeCommand(const string &cmd){
     FILE *p = popen((cmd + " 2>&1").c_str(), "r");
     if (!p)
         return "[popen failed]";

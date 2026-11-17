@@ -1,0 +1,59 @@
+services:
+  bit-server:
+    image: ghcr.io/viktorrost007-arch/bit-server:latest # Готовый образ с GitHub
+    container_name: bit-server
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+      - WHISPER_HOST=http://whisper:9000/v1/audio/transcriptions
+      - OLLAMA_MODEL=qwen2.5:7b
+    depends_on:
+      - ollama
+      - whisper
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    restart: unless-stopped
+    volumes:
+      - ollama_data:/root/.ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  ollama-init:
+    image: curlimages/curl:latest
+    container_name: ollama-init
+    depends_on:
+      - ollama
+    entrypoint: >
+      sh -c "
+      echo 'Ждем Ollama...' &&
+      sleep 15 &&
+      echo 'Качаем модель...' &&
+      curl -X POST http://ollama:11434/api/pull -d '{\"name\": \"qwen2.5:7b\"}' &&
+      exit 0
+      "
+
+  whisper:
+    image: onerahmet/openai-whisper-asr-webservice:latest-gpu
+    container_name: whisper
+    restart: unless-stopped
+    environment:
+      - ASR_MODEL=base
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+volumes:
+  ollama_data:

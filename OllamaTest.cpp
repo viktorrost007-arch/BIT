@@ -5,7 +5,7 @@
 
 
 int main() {
-  
+  checkProperties();
   cout<< greeting << endl; //BIT
 
   checkfirst_time();

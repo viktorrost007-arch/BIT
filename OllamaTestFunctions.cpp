@@ -133,6 +133,8 @@ void reset()
         remove("log.txt");
         cout << "." << endl;
         setup();
+        cout<< "Setup finished!"<< endl;
+        myexit();
         return;
     }
     else
@@ -234,7 +236,10 @@ void setup()
     }
      cout << "Are you using our server? (" << colors["YELLOW"] << "(true/false)" << colors["RESET"] << endl;
      cin >> first_time_settings["server_in_use"];
-
+    if (first_time_settings["server_in_use"]== "true"){
+        cout<< "Please type in the address of the server" << colors["YELLOW"] << "(for example ws://192.168.20.4:8080/agent)"<< colors ["RESET"];
+        cin >> first_time_settings["server_address"];
+    }
 
     cout << "Which art of LLM do you use? (" << colors["YELLOW"] << "ollama" << colors["RESET"] << " for Ollama server, " << colors["YELLOW"] << "openai" << colors["RESET"] << " for Deepseek/ChatGPT/Claude and others)" << endl;
     cin >> first_time_settings["llm_type"];
@@ -362,8 +367,11 @@ void handleInput()
             setup();
             readSettings();
         }
-        if (uinput == "/reset")
+        if (uinput == "/reset"){
             reset();
+            uinput = "";
+            continue;
+        }
         if (uinput == "/update")
             update();
         if (uinput == "/allow")
